@@ -1,4 +1,4 @@
-from functions.twitchAPI import verifyGame, isOnline, getImageGame
+from functions.twitchAPI import verifyGame, isOnline, getImageGame, getTitle, returnTimestamp
 
 import os
 from time import sleep
@@ -28,9 +28,6 @@ if isOnline():
     online = True
     currentGame = verifyGame()
 
-def checkIsOnline():
-    return True if isOnline() else False
-
 @bot.event
 async def on_ready():
     print('Online!')
@@ -38,14 +35,18 @@ async def on_ready():
 
 @tasks.loop(seconds=15)
 async def checkGame():
+    if isOnline() == True and online == False:
+        api.update_status(f'Cellbit entrou ao vivo!\nTítulo: {getTitle}\nhttps://twitch.tv/cellbit')
+    if online == True and isOnline() == False:
+        api.update_status('Cellbit encerrou a live!')
     global currentGame
-    game = verifyGame()
     if isOnline():
+        game = verifyGame()
         if game != currentGame:
             currentGame = game
             textPost = f'Cellbit está jogando: {game}\nhttps://twitch.tv/cellbit'
-            getImageGame(game)
+            # getImageGame(game)
             sleep(3)
-            api.update_status_with_media(textPost, 'gameImg.jpg')
+            # api.update_status_with_media(textPost, 'gameImg.jpg')
 
 bot.run("OTY4MTkzMzE0NTk3Nzc3NDc5.YmbSSg.IKhoiWVe7GWtFWncUGrBJ07304Q")

@@ -12,12 +12,18 @@ params = {
 
 
 def verifyGame():
-    response = requests.get(
-        'https://api.twitch.tv/helix/streams', params=params, headers=headers)
+    response = requests.get('https://api.twitch.tv/helix/streams', params=params, headers=headers)
     responseText = response.text
     responseJson = json.loads(responseText)
     game = responseJson['data'][0]['game_name']
     return game
+
+def getTitle():
+    response = requests.get('https://api.twitch.tv/helix/streams', params=params, headers=headers)
+    responseText = response.text
+    responseJson = json.loads(responseText)
+    title = responseJson['data'][0]['title']
+    return title
 
 
 def isOnline():
@@ -45,3 +51,17 @@ def getProfileImage(user):
     responseText = response.text
     responseJson = json.loads(responseText)
     print(responseJson)
+
+# def returnTimestamp():
+#     from dateutil.parser import parse
+#     import datetime
+
+#     response = requests.get('https://api.twitch.tv/helix/streams', params=params, headers=headers)
+#     responseText = response.text
+#     responseJson = json.loads(responseText)
+#     started_at = datetime.datetime.strptime(responseJson['data'][0]['started_at'], '%Y-%m-%dT%H:%M:%SZ')
+#     UTC = datetime.datetime.utcnow()
+
+#     print(started_at)
+#     exit()
+
