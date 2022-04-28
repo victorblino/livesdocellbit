@@ -1,4 +1,4 @@
-from functions.twitchAPI import verifyGame, isOnline, getImageGame, getTitle, returnTimestamp
+from functions.twitchAPI import verifyGame, isOnline, getImageGame, getTitle
 
 import os
 from time import sleep
@@ -45,8 +45,8 @@ async def checkGame():
         if game != currentGame:
             currentGame = game
             textPost = f'Cellbit está jogando: {game}\nhttps://twitch.tv/cellbit'
-            # getImageGame(game)
+            getImageGame(game)
             sleep(3)
-            # api.update_status_with_media(textPost, 'gameImg.jpg')
+            api.update_status_with_media(textPost, 'gameImg.jpg')
 
 bot.run("OTY4MTkzMzE0NTk3Nzc3NDc5.YmbSSg.IKhoiWVe7GWtFWncUGrBJ07304Q")
