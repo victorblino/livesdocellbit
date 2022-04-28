@@ -10,12 +10,15 @@ params = {
     'user_login': 'Cellbit',
 }
 
+
 def verifyGame():
-    response = requests.get('https://api.twitch.tv/helix/streams', params=params, headers=headers)
+    response = requests.get(
+        'https://api.twitch.tv/helix/streams', params=params, headers=headers)
     responseText = response.text
     responseJson = json.loads(responseText)
     game = responseJson['data'][0]['game_name']
     return game
+
 
 def isOnline():
     try:
@@ -24,12 +27,21 @@ def isOnline():
     except:
         return False
 
+
 def getImageGame(game):
     import urllib.request
 
-    response = requests.get(f'https://api.twitch.tv/helix/games?name={game}', headers=headers)
+    response = requests.get(
+        f'https://api.twitch.tv/helix/games?name={game}', headers=headers)
     responseText = response.text
     responseJson = json.loads(responseText)
-    imageUrl = responseJson['data'][0]['box_art_url'].replace('{width}', '600').replace('{height}', '800')
-    
+    imageUrl = responseJson['data'][0]['box_art_url'].replace(
+        '{width}', '600').replace('{height}', '800')
+
     urllib.request.urlretrieve(imageUrl, 'gameImg.jpg')
+
+def getProfileImage(user):
+    response = requests.get(f'https://api.twitch.tv/helix/users?login={user} ', params=params, headers=headers)
+    responseText = response.text
+    responseJson = json.loads(responseText)
+    print(responseJson)
