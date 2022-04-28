@@ -1,7 +1,11 @@
 from functions.twitchAPI import verifyGame, isOnline, getImageGame
-import discord
+
 import os
+from time import sleep
+
+import discord
 from discord.ext import tasks
+
 import tweepy
 
 global currentGame, online
@@ -34,13 +38,13 @@ async def on_ready():
 
 @tasks.loop(seconds=15)
 async def checkGame():
-    from time import sleep
     global currentGame
+    game = verifyGame()
     if isOnline():
-        if verifyGame() != currentGame:
-            currentGame = verifyGame()
-            textPost = f'Cellbit está jogando: {currentGame}\nhttps://twitch.tv/cellbit'
-            getImageGame(currentGame)
+        if game != currentGame:
+            currentGame = game
+            textPost = f'Cellbit está jogando: {game}\nhttps://twitch.tv/cellbit'
+            getImageGame(game)
             sleep(3)
             api.update_status_with_media(textPost, 'gameImg.jpg')
 
