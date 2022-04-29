@@ -33,13 +33,17 @@ async def on_ready():
     print('Online!')
     checkGame.start()
 
+
 @tasks.loop(seconds=15)
 async def checkGame():
+    
     if isOnline() == True and online == False:
         api.update_status(f'Cellbit entrou ao vivo!\nTítulo: {getTitle}\nhttps://twitch.tv/cellbit')
     if online == True and isOnline() == False:
         api.update_status('Cellbit encerrou a live!')
+    
     global currentGame
+    
     if isOnline():
         infos = verifyGame()
         game = infos['game']
@@ -47,12 +51,19 @@ async def checkGame():
 
         if game != currentGame:
             currentGame = game
+
             textPost = f'Cellbit está jogando: {game}\nMinutagem no VOD: ~{timestampVod} \nhttps://twitch.tv/cellbit'
+            textTimestamp = f'Link do VOD: {getVideo()}?t=42h27m23s'
+
             getImageGame(game)
+
             sleep(2)
+            
             api.update_status_with_media(textPost, 'gameImg.jpg')
+            
             sleep(1)
-            tweetId = api.user_timeline(screen_name='livesdocellbit')
-            api.update_status(f'Link do VOD: {getVideo()}?t={timestampVod}', tweetId)
+            
+            tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
+            api.update_status(textTimestamp, in_reply_to_status_id = tweetId)
 
 bot.run("OTY4MTkzMzE0NTk3Nzc3NDc5.YmbSSg.IKhoiWVe7GWtFWncUGrBJ07304Q")
