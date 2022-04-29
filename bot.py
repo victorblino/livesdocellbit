@@ -44,7 +44,6 @@ async def checkGame():
         infos = verifyGame()
         game = infos['game']
         timestampVod = f'{infos["vodHours"]}h{infos["vodMinutes"]}m{infos["vodSeconds"]}s'
-        print(timestampVod)
         if game != currentGame:
             currentGame = game
             textPost = f'Cellbit está jogando: {game}\nMinutagem no VOD: ~{timestampVod} \nhttps://twitch.tv/cellbit'
