@@ -12,14 +12,51 @@ params = {
 
 
 def verifyGame():
-    response = requests.get('https://api.twitch.tv/helix/streams', params=params, headers=headers)
+
+    import datetime
+    import dateutil.parser
+
+    response = requests.get(
+        'https://api.twitch.tv/helix/streams', params=params, headers=headers)
     responseText = response.text
     responseJson = json.loads(responseText)
-    game = responseJson['data'][0]['game_name']
-    return game
+
+    started_at = responseJson['data'][0]['started_at']
+
+    parsedDate = dateutil.parser.isoparse(started_at)
+    parsedDate = str(parsedDate).split("+", 1)
+    parsedDate = parsedDate[0]
+    parsedDate = datetime.datetime.strptime(parsedDate, "%Y-%m-%d %H:%M:%S")
+
+    now = datetime.datetime.now()
+    now = str(now).split(".", 1)
+    now = now[0]
+    now = datetime.datetime.strptime(now, "%Y-%m-%d %H:%M:%S")
+
+    diff = now - (parsedDate - datetime.timedelta(hours=0))
+
+    seconds = diff.total_seconds()
+
+    if seconds > 86400:
+
+        tempo_no_vod = str(datetime.timedelta(seconds=seconds-86400))
+        tempo_no_vod = datetime.datetime.strptime(tempo_no_vod, "%H:%M:%S")
+        tempo_no_vod_hour = tempo_no_vod.hour + 24
+        tempo_no_vod_minutes = tempo_no_vod.minute
+        tempo_no_vod_seconds = tempo_no_vod.second
+
+        return {
+            'vodHours': tempo_no_vod_hour,
+            'vodMinutes': tempo_no_vod_minutes,
+            'vodSeconds': tempo_no_vod_seconds,
+            'game': responseJson['data'][0]['game_name'],
+            'vodId': responseJson['data'][0]['id'],
+        }
+
 
 def getTitle():
-    response = requests.get('https://api.twitch.tv/helix/streams', params=params, headers=headers)
+    response = requests.get(
+        'https://api.twitch.tv/helix/streams', params=params, headers=headers)
     responseText = response.text
     responseJson = json.loads(responseText)
     title = responseJson['data'][0]['title']
@@ -46,22 +83,25 @@ def getImageGame(game):
 
     urllib.request.urlretrieve(imageUrl, 'gameImg.jpg')
 
-def getProfileImage(user):
-    response = requests.get(f'https://api.twitch.tv/helix/users?login={user} ', params=params, headers=headers)
+
+def getInfoUser():
+    response = requests.get(
+        f'https://api.twitch.tv/helix/users?login=Cellbit', params=params, headers=headers)
     responseText = response.text
     responseJson = json.loads(responseText)
-    print(responseJson)
+    return {
+        'userId': responseJson['data'][0]['id']
+    }
 
-# def returnTimestamp():
-#     from dateutil.parser import parse
-#     import datetime
+def getVideo():
 
-#     response = requests.get('https://api.twitch.tv/helix/streams', params=params, headers=headers)
-#     responseText = response.text
-#     responseJson = json.loads(responseText)
-#     started_at = datetime.datetime.strptime(responseJson['data'][0]['started_at'], '%Y-%m-%dT%H:%M:%SZ')
-#     UTC = datetime.datetime.utcnow()
+    params = {
+    'user_id': '28579002',
+}
 
-#     print(started_at)
-#     exit()
-
+    response = requests.get(
+        f'https://api.twitch.tv/helix/videos?', headers=headers, params=params)
+    responseText = response.text
+    responseJson = json.loads(responseText)
+    return responseJson['data'][0]['url']
+    
