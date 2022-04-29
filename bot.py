@@ -53,7 +53,7 @@ async def checkGame():
             currentGame = game
 
             textPost = f'Cellbit está jogando: {game}\nMinutagem no VOD: ~{timestampVod} \nhttps://twitch.tv/cellbit'
-            textTimestamp = f'Link do VOD: {getVideo()}?t=42h27m23s'
+            textTimestamp = f'Link do VOD: {getVideo()}?t={timestampVod}'
 
             getImageGame(game)
 

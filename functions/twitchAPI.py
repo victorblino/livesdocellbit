@@ -16,14 +16,16 @@ def verifyGame():
     import datetime
     import dateutil.parser
 
-    global tempo_no_vod_hour, tempo_no_vod_minutes, tempo_no_vod_seconds
-
     response = requests.get(
         'https://api.twitch.tv/helix/streams', params=params, headers=headers)
     responseText = response.text
     responseJson = json.loads(responseText)
 
+    global started_at, game, vodId
+
     started_at = responseJson['data'][0]['started_at']
+    game = responseJson['data'][0]['game_name']
+    vodId = responseJson['data'][0]['id']
 
     parsedDate = dateutil.parser.isoparse(started_at)
     parsedDate = str(parsedDate).split("+", 1)
@@ -40,20 +42,26 @@ def verifyGame():
     seconds = diff.total_seconds()
 
     if seconds > 86400:
-
         tempo_no_vod = str(datetime.timedelta(seconds=seconds-86400))
         tempo_no_vod = datetime.datetime.strptime(tempo_no_vod, "%H:%M:%S")
         tempo_no_vod_hour = tempo_no_vod.hour + 24
         tempo_no_vod_minutes = tempo_no_vod.minute
         tempo_no_vod_seconds = tempo_no_vod.second
 
+    else:
+        tempo_no_vod = str(datetime.timedelta(seconds=seconds+86400, days=-1))
+        tempo_no_vod = datetime.datetime.strptime(tempo_no_vod, "%H:%M:%S")
+        tempo_no_vod_hour = tempo_no_vod.hour
+        tempo_no_vod_minutes = tempo_no_vod.minute
+        tempo_no_vod_seconds = tempo_no_vod.second
+
     return {
-            'vodHours': tempo_no_vod_hour,
-            'vodMinutes': tempo_no_vod_minutes,
-            'vodSeconds': tempo_no_vod_seconds,
-            'game': responseJson['data'][0]['game_name'],
-            'vodId': responseJson['data'][0]['id'],
-        }
+        'vodHours': tempo_no_vod_hour,
+        'vodMinutes': tempo_no_vod_minutes,
+        'vodSeconds': tempo_no_vod_seconds,
+        'game': game,
+        'vodId': vodId,
+    }
 
 
 def getTitle():
@@ -95,15 +103,15 @@ def getInfoUser():
         'userId': responseJson['data'][0]['id']
     }
 
+
 def getVideo():
 
     params = {
-    'user_id': '28579002',
-}
+        'user_id': '28579002',
+    }
 
     response = requests.get(
         f'https://api.twitch.tv/helix/videos?', headers=headers, params=params)
     responseText = response.text
     responseJson = json.loads(responseText)
     return responseJson['data'][0]['url']
-    
