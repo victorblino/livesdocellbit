@@ -44,12 +44,15 @@ async def checkGame():
         infos = verifyGame()
         game = infos['game']
         timestampVod = f'{infos["vodHours"]}h{infos["vodMinutes"]}m{infos["vodSeconds"]}s'
+
         if game != currentGame:
             currentGame = game
             textPost = f'Cellbit está jogando: {game}\nMinutagem no VOD: ~{timestampVod} \nhttps://twitch.tv/cellbit'
             getImageGame(game)
-            sleep(3)
-            status = api.update_status_with_media(textPost, 'gameImg.jpg')
-            api.update_status(f'Link do VOD: {getVideo()}?t={timestampVod}', status)
+            sleep(2)
+            api.update_status_with_media(textPost, 'gameImg.jpg')
+            sleep(1)
+            tweetId = api.user_timeline(screen_name='livesdocellbit')
+            api.update_status(f'Link do VOD: {getVideo()}?t={timestampVod}', tweetId)
 
 bot.run("OTY4MTkzMzE0NTk3Nzc3NDc5.YmbSSg.IKhoiWVe7GWtFWncUGrBJ07304Q")
