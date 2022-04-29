@@ -16,6 +16,8 @@ def verifyGame():
     import datetime
     import dateutil.parser
 
+    global tempo_no_vod_hour, tempo_no_vod_minutes, tempo_no_vod_seconds
+
     response = requests.get(
         'https://api.twitch.tv/helix/streams', params=params, headers=headers)
     responseText = response.text
@@ -45,7 +47,7 @@ def verifyGame():
         tempo_no_vod_minutes = tempo_no_vod.minute
         tempo_no_vod_seconds = tempo_no_vod.second
 
-        return {
+    return {
             'vodHours': tempo_no_vod_hour,
             'vodMinutes': tempo_no_vod_minutes,
             'vodSeconds': tempo_no_vod_seconds,
