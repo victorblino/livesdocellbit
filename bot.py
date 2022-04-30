@@ -1,4 +1,4 @@
-from functions.twitchAPI import verifyGame, isOnline, getImageGame, getTitle, getVideo
+from functions.twitchAPI import getStream, isOnline, getImageGame, getVideo
 
 import os
 from time import sleep
@@ -26,7 +26,7 @@ bot = discord.Bot()
 
 if isOnline():
     online = True
-    currentGame = verifyGame()['game']
+    currentGame = getStream()['game']
 
 @bot.event
 async def on_ready():
@@ -36,16 +36,16 @@ async def on_ready():
 
 @tasks.loop(seconds=15)
 async def checkGame():
-    
     if isOnline() == True and online == False:
-        api.update_status(f'Cellbit entrou ao vivo!\nTítulo: {getTitle}\nhttps://twitch.tv/cellbit')
+        title = getStream()['title']
+        api.update_status(f'Cellbit entrou ao vivo!\nTítulo: {title}\nhttps://twitch.tv/cellbit')
     if online == True and isOnline() == False:
         api.update_status('Cellbit encerrou a live!')
     
     global currentGame
     
     if isOnline():
-        infos = verifyGame()
+        infos = getStream()
         game = infos['game']
         timestampVod = f'{infos["vodHours"]}h{infos["vodMinutes"]}m{infos["vodSeconds"]}s'
 

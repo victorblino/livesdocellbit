@@ -10,8 +10,7 @@ params = {
     'user_login': 'Cellbit',
 }
 
-
-def verifyGame():
+def getStream():
 
     import datetime
     import dateutil.parser
@@ -26,6 +25,7 @@ def verifyGame():
     started_at = responseJson['data'][0]['started_at']
     game = responseJson['data'][0]['game_name']
     vodId = responseJson['data'][0]['id']
+    title = responseJson['data'][0]['title']
 
     parsedDate = dateutil.parser.isoparse(started_at)
     parsedDate = str(parsedDate).split("+", 1)
@@ -61,17 +61,8 @@ def verifyGame():
         'vodSeconds': tempo_no_vod_seconds,
         'game': game,
         'vodId': vodId,
+        'title': title
     }
-
-
-def getTitle():
-    response = requests.get(
-        'https://api.twitch.tv/helix/streams', params=params, headers=headers)
-    responseText = response.text
-    responseJson = json.loads(responseText)
-    title = responseJson['data'][0]['title']
-    return title
-
 
 def isOnline():
     try:
@@ -79,7 +70,6 @@ def isOnline():
         return True
     except:
         return False
-
 
 def getImageGame(game):
     import urllib.request
@@ -101,8 +91,7 @@ def getInfoUser():
     responseJson = json.loads(responseText)
     return {
         'userId': responseJson['data'][0]['id']
-    }
-
+    } 
 
 def getVideo():
 
