@@ -36,11 +36,12 @@ async def on_ready():
 
 @tasks.loop(seconds=15)
 async def checkGame():
-    if isOnline() == True and online == False:
-        title = getStream()['title']
-        api.update_status(f'Cellbit entrou ao vivo!\nTítulo: {title}\nhttps://twitch.tv/cellbit')
-    if online == True and isOnline() == False:
-        api.update_status('Cellbit encerrou a live!')
+    # if isOnline() == True and online == False:
+    #     title = getStream()['title']
+    #     api.update_status(f'Cellbit entrou ao vivo!\nTítulo: {title}\nhttps://twitch.tv/cellbit')
+    # if online == True and isOnline() == False:
+    #     status = 'Cellbit encerrou a live!'
+    #     api.update_status('Cellbit encerrou a live!')
     
     global currentGame
     
