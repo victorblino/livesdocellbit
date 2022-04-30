@@ -45,6 +45,7 @@ async def checkGame():
     global currentGame
     
     if isOnline():
+        print('cu')
         infos = getStream()
         game = infos['game']
         timestampVod = f'{infos["vodHours"]}h{infos["vodMinutes"]}m{infos["vodSeconds"]}s'
@@ -52,15 +53,18 @@ async def checkGame():
         if game != currentGame:
             currentGame = game
 
+
             textPost = f'Cellbit está jogando: {game}\nMinutagem no VOD: ~{timestampVod} \nhttps://twitch.tv/cellbit'
             textTimestamp = f'Link do VOD: {getVideo()}?t={timestampVod}'
 
-            getImageGame(game)
+            try:
+                getImageGame(game)
+                sleep(2)
+                api.update_status_with_media(textPost, 'gameImg.jpg')
 
-            sleep(2)
-            
-            api.update_status_with_media(textPost, 'gameImg.jpg')
-            
+            except:
+                api.update_status(textPost)
+
             sleep(1)
             
             tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id

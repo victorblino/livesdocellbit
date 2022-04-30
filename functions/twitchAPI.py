@@ -66,7 +66,7 @@ def getStream():
 
 def isOnline():
     try:
-        verifyGame()
+        getStream()
         return True
     except:
         return False
@@ -78,8 +78,8 @@ def getImageGame(game):
         f'https://api.twitch.tv/helix/games?name={game}', headers=headers)
     responseText = response.text
     responseJson = json.loads(responseText)
-    imageUrl = responseJson['data'][0]['box_art_url'].replace(
-        '{width}', '600').replace('{height}', '800')
+    
+    imageUrl = responseJson['data'][0]['box_art_url'].replace('{width}', '600').replace('{height}', '800')
 
     urllib.request.urlretrieve(imageUrl, 'gameImg.jpg')
 
