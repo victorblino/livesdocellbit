@@ -46,7 +46,12 @@ async def checkGame():
     global currentGame
     
     if isOnline():
-        infos = getStream()
+
+        try:
+            infos = getStream()
+        except:
+            return
+
         game = infos['game']
         timestampVod = f'{infos["vodHours"]}h{infos["vodMinutes"]}m{infos["vodSeconds"]}s'
 
