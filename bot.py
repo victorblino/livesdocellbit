@@ -8,7 +8,8 @@ from discord.ext import tasks
 
 import tweepy
 
-global currentGame, online
+global currentGame, online, gamesPlayed
+gamesPlayed = list()
 
 auth = tweepy.OAuthHandler("GPRorX0IZ7wp4s9EcmD1Y3Vzp", "icHW0EvWkmbPXZUoukUZY2ow9BAeiGvKrMwdWm9zlZiNJ926z7")
 auth.set_access_token("1278567210991210502-sEmyQXOYI4HMPBHxYP2MEzo9RKKGuQ", "o4uhnyVCnuq5INQc3EqGpLEeGvf5JaJPzdgjtuURwCvZY")
@@ -40,11 +41,13 @@ async def checkGame():
     if isOnline() == True and online == False:
         title = getStream()['title']
         api.update_status(f'Cellbit entrou ao vivo!\nTítulo: {title}\nhttps://twitch.tv/cellbit')
-        online = True 
+        online = True
+        pass
     if online == True and isOnline() == False:
         status = 'Cellbit encerrou a live!'
         api.update_status(status)
         online = False
+        print(f'Lives finalizada! Jogos jogados: {gamesPlayed}')
         return
     
     global currentGame
@@ -78,5 +81,8 @@ async def checkGame():
             
             tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
             api.update_status(textTimestamp, in_reply_to_status_id = tweetId)
+            
+            if game != 'Just Chatting' and game not in gamesPlayed:
+                gamesPlayed.append(game)
 
 bot.run("OTY4MTkzMzE0NTk3Nzc3NDc5.YmbSSg.IKhoiWVe7GWtFWncUGrBJ07304Q")
