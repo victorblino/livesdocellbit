@@ -61,7 +61,8 @@ def getStream():
         'vodSeconds': tempo_no_vod_seconds,
         'game': game,
         'vodId': vodId,
-        'title': title
+        'title': title,
+        'started_at': started_at
     }
 
 def isOnline():
@@ -104,3 +105,21 @@ def getVideo():
     responseText = response.text
     responseJson = json.loads(responseText)
     return responseJson['data'][0]['url']
+
+def dateStream():
+    import datetime
+    import dateutil.parser
+
+    started_at = getStream()['started_at']
+    parsedDate = dateutil.parser.isoparse(started_at)
+    parsedDate = str(parsedDate).split("+", 1)
+    parsedDate = parsedDate[0]
+    parsedDate = datetime.datetime.strptime(parsedDate, "%Y-%m-%d %H:%M:%S")
+    parsedDate = str(parsedDate.date())
+    date = datetime.datetime.strptime(parsedDate, "%Y-%m-%d")
+
+    return {
+        'day': date.day,
+        'month': date.month,
+        'year': date.year
+    }

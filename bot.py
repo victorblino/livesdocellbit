@@ -1,4 +1,4 @@
-from functions.twitchAPI import getStream, isOnline, getImageGame, getVideo
+from functions.twitchAPI import getStream, isOnline, getImageGame, getVideo, dateStream
 
 import os
 from time import sleep
@@ -38,16 +38,28 @@ async def on_ready():
 @tasks.loop(seconds=15)
 async def checkGame():
     global online
+    
     if isOnline() == True and online == False:
         title = getStream()['title']
         api.update_status(f'Cellbit entrou ao vivo!\nTítulo: {title}\nhttps://twitch.tv/cellbit')
         online = True
         pass
+
     if online == True and isOnline() == False:
         status = 'Cellbit encerrou a live!'
         api.update_status(status)
         online = False
-        print(f'Lives finalizada! Jogos jogados: {gamesPlayed}')
+        
+        date = dateStream()
+        status = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
+
+        for game in gamesPlayed:
+            status += f'• {game}\n'
+        status += f'\nVOD: {getVideo()}'
+
+        sleep(1)
+        tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
+        api.update_status(status, in_reply_to_status_id = tweetId)
         return
     
     global currentGame
