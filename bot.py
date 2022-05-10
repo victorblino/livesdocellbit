@@ -50,16 +50,17 @@ async def checkGame():
         api.update_status(status)
         online = False
         
-        date = dateStream()
-        status = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
+        if len(gamesPlayed) > 0:
+            date = dateStream()
+            status = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
 
-        for game in gamesPlayed:
-            status += f'• {game}\n'
-        status += f'\nVOD: {getVideo()}'
+            for game in gamesPlayed:
+                status += f'• {game}\n'
+            status += f'\nVOD: {getVideo()}'
 
-        sleep(1)
-        tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
-        api.update_status(status, in_reply_to_status_id = tweetId)
+            sleep(1)
+            tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
+            api.update_status(status, in_reply_to_status_id = tweetId)
         return
     
     global currentGame
