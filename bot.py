@@ -1,4 +1,5 @@
 from functions.twitchAPI import getStream, isOnline, getImageGame, getVideo, dateStream
+from functions.functionsBot import compareImages
 
 import os
 from time import sleep
@@ -53,18 +54,31 @@ async def checkGame():
         status = 'Cellbit encerrou a live!'
         api.update_status(status)
         online = False
+        checkStatus = False
         
         if len(gamesPlayed) > 0:
             date = dateStream()
             status = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
 
             for game in gamesPlayed:
-                status += f'• {game}\n'
-            status += f'\nVOD: {getVideo()}'
+                addGame = f'• {game}\n'
+                if len(addGame + status) < 280:
+                    status += addGame
+                elif len(addGame + status) > 280:
+                    checkStatus = True
+                    secondStatus += addGame
 
-            sleep(1)
-            tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
-            api.update_status(status, in_reply_to_status_id = tweetId)
+            if checkStatus == True:
+                tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
+                api.update_status(status, in_reply_to_status_id = tweetId)
+                sleep(3)
+                secondStatus += f'\nVOD: {getVideo()}'
+                tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
+                api.update_status(secondStatus, in_reply_to_status_id = tweetId)
+            else:
+                status += f'\nVOD: {getVideo()}'
+                tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
+                api.update_status(status, in_reply_to_status_id = tweetId)
         return
     
     global currentGame
@@ -89,8 +103,10 @@ async def checkGame():
             try:
                 getImageGame(game)
                 sleep(2)
-                api.update_status_with_media(textPost, 'gameImg.jpg')
-
+                if compareImages():
+                    api.update_status(textPost)
+                else:
+                    api.update_status_with_media(textPost, 'gameImg.jpg')
             except:
                 api.update_status(textPost)
 
@@ -99,7 +115,8 @@ async def checkGame():
             tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
             api.update_status(textTimestamp, in_reply_to_status_id = tweetId)
             
-            if game != 'Just Chatting' and game not in gamesPlayed:
+            gamesBlacklist = ['Just Chatting', 'Watch Party']
+            if game in gamesBlacklist and game not in gamesPlayed:
                 gamesPlayed.append(game)
 
 bot.run("OTY4MTkzMzE0NTk3Nzc3NDc5.YmbSSg.IKhoiWVe7GWtFWncUGrBJ07304Q")
