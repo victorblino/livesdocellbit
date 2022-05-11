@@ -40,7 +40,11 @@ async def checkGame():
     global online
     
     if isOnline() == True and online == False:
-        title = getStream()['title']
+        try: 
+            title = getStream()['title']
+        except Exception as err: 
+            print(f'Erro na função isOnline: {err}')
+            return
         api.update_status(f'Cellbit entrou ao vivo!\nTítulo: {title}\nhttps://twitch.tv/cellbit')
         online = True
         pass
