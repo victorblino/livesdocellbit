@@ -31,7 +31,7 @@ if isOnline():
         currentGame = getStream()['game']
         online = True
         if currentGame not in gamesPlayed and currentGame != 'Just Chatting':
-            gamesPlayed.append(game)
+            gamesPlayed.append(currentGame)
     except Exception as err:
         print(f'Erro na função isOnline: {err}')
 @bot.event
