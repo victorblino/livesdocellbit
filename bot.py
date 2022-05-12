@@ -27,8 +27,11 @@ currentGame = None
 bot = discord.Bot()
 
 if isOnline():
-    online = True
-    currentGame = getStream()['game']
+    try:
+        currentGame = getStream()['game']
+        online = True
+    except:
+        print('Erro no isOnline')
 
 @bot.event
 async def on_ready():
@@ -57,7 +60,10 @@ async def checkGame():
         checkStatus = False
         
         if len(gamesPlayed) > 0:
-            date = dateStream()
+            try:
+                date = dateStream()
+            except:
+                return
             status = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
 
             for game in gamesPlayed:
