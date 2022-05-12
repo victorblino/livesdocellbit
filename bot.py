@@ -30,9 +30,10 @@ if isOnline():
     try:
         currentGame = getStream()['game']
         online = True
-    except:
-        print('Erro no isOnline')
-
+        if currentGame not in gamesPlayed:
+            gamesPlayed.append(game)
+    except Exception as err:
+        print(f'Erro na função isOnline: {err}')
 @bot.event
 async def on_ready():
     print('Online!')
