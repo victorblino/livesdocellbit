@@ -30,7 +30,7 @@ if isOnline():
     try:
         currentGame = getStream()['game']
         online = True
-        if currentGame not in gamesPlayed:
+        if currentGame not in gamesPlayed and currentGame != 'Just Chatting':
             gamesPlayed.append(game)
     except Exception as err:
         print(f'Erro na função isOnline: {err}')
