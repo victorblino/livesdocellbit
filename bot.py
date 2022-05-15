@@ -59,34 +59,34 @@ async def checkGame():
         api.update_status(status)
         online = False
         checkStatus = False
+        listStatus = dict()
         
         if len(gamesPlayed) > 0:
             try:
                 date = dateStream()
             except:
                 return
-            status = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
+            status1 = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
 
             for game in gamesPlayed:
-                addGame = f'• {game}\n'
-                if len(addGame + status) < 280:
-                    status += addGame
-                elif len(addGame + status) > 280:
-                    checkStatus = True
-                    secondStatus += addGame
-
-            if checkStatus == True:
+                if len(status1) + len(game) < 280:
+                    status1 += f' • {game}\n'
+                    listStatus[0] = status1
+                elif len(status2) + len(game) > 280 and len(status2) + len(game) < 560:
+                    status2 += f' • {game}\n'
+                    listStatus[1] = status2
+                elif len(status3) + len(game) > 840 and len(status3) + len(game) < 840:
+                    status3 += f' • {game}\n'
+                    listStatus[2] = status3
+        
+            last = list(listStatus)[-1]
+            listStatus[last] += f'\nVOD: {getVideo()}'
+        
+            for status in listStatus:
                 tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
-                api.update_status(status, in_reply_to_status_id = tweetId)
-                sleep(3)
-                secondStatus += f'\nVOD: {getVideo()}'
-                tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
-                api.update_status(secondStatus, in_reply_to_status_id = tweetId)
-            else:
-                status += f'\nVOD: {getVideo()}'
-                tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
-                api.update_status(status, in_reply_to_status_id = tweetId)
-        return
+                api.update_status(listStatus[status], in_reply_to_status_id=tweetId)
+                sleep(5)
+            return
     
     global currentGame
     
