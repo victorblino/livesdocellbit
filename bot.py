@@ -34,6 +34,9 @@ if isOnline():
             gamesPlayed.append(currentGame)
     except Exception as err:
         print(f'Erro na função isOnline: {err}')
+        print('Setando game para Just Chatting...')
+        currentGame = 'Just Chatting'
+
 @bot.event
 async def on_ready():
     print('Online!')
