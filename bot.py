@@ -92,9 +92,7 @@ async def checkGame():
                 api.update_status(listStatus[status], in_reply_to_status_id=tweetId)
                 sleep(5)
             return
-    
-    global currentGame
-    
+        
     if isOnline():
 
         try:

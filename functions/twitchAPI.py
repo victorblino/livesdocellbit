@@ -110,7 +110,16 @@ def dateStream():
     import datetime
     import dateutil.parser
 
-    started_at = getStream()['started_at']
+    params = {
+            'user_id': '28579002',
+        }
+
+    response = requests.get(
+            f'https://api.twitch.tv/helix/videos?', headers=headers, params=params)
+    responseText = response.text
+    responseJson = json.loads(responseText)
+    started_at = responseJson['data'][0]['created_at']
+
     parsedDate = dateutil.parser.isoparse(started_at)
     parsedDate = str(parsedDate).split("+", 1)
     parsedDate = parsedDate[0]
