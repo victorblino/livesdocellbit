@@ -52,6 +52,8 @@ async def checkGame():
             title = getStream()['title']
         except Exception as err: 
             print(f'Erro na função isOnline: {err}')
+            print('Setando game como Just Chatting...')
+            currentGame = 'Just Chatting'
             return
         api.update_status(f'Cellbit entrou ao vivo!\nTítulo: {title}\nhttps://twitch.tv/cellbit')
         online = True
