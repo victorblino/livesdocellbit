@@ -45,7 +45,7 @@ async def on_ready():
 
 @tasks.loop(seconds=15)
 async def checkGame():
-    global online
+    global online, currentGame
     
     if isOnline() == True and online == False:
         try: 
@@ -72,7 +72,8 @@ async def checkGame():
             except:
                 return
             status1 = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
-
+            status2 = ''
+            status3 = ''
             for game in gamesPlayed:
                 if len(status1) + len(game) < 280:
                     status1 += f' • {game}\n'
@@ -102,7 +103,7 @@ async def checkGame():
 
         game = infos['game']
         timestampVod = f'{infos["vodHours"]}h{infos["vodMinutes"]}m{infos["vodSeconds"]}s'
-
+        
         if game != currentGame:
             currentGame = game
 
