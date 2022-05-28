@@ -46,7 +46,6 @@ async def on_ready():
 @tasks.loop(seconds=15)
 async def checkGame():
     global online, currentGame
-    online = False
     if isOnline() == True and online == False:
         try: 
             title = getStream()['title']
