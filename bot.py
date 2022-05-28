@@ -46,7 +46,7 @@ async def on_ready():
 @tasks.loop(seconds=15)
 async def checkGame():
     global online, currentGame
-    
+    online = False
     if isOnline() == True and online == False:
         try: 
             title = getStream()['title']
@@ -63,7 +63,6 @@ async def checkGame():
         status = 'Cellbit encerrou a live!'
         api.update_status(status)
         online = False
-        checkStatus = False
         listStatus = dict()
         
         if len(gamesPlayed) > 0:
@@ -75,15 +74,8 @@ async def checkGame():
             status2 = ''
             status3 = ''
             for game in gamesPlayed:
-                if len(status1) + len(game) < 280:
-                    status1 += f' • {game}\n'
-                    listStatus[0] = status1
-                elif len(status2) + len(game) > 280 and len(status2) + len(game) < 560:
-                    status2 += f' • {game}\n'
-                    listStatus[1] = status2
-                elif len(status3) + len(game) > 840 and len(status3) + len(game) < 840:
-                    status3 += f' • {game}\n'
-                    listStatus[2] = status3
+                status1 += f' • {game}\n'
+                listStatus[0] = status1
         
             last = list(listStatus)[-1]
             listStatus[last] += f'\nVOD: {getVideo()}'
@@ -121,7 +113,7 @@ async def checkGame():
             except:
                 api.update_status(textPost)
 
-            sleep(1)
+            sleep(3)
             
             tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
             api.update_status(textTimestamp, in_reply_to_status_id = tweetId)
