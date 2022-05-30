@@ -1,6 +1,7 @@
 from functions.twitchAPI import getStream, isOnline, getImageGame, getVideo, dateStream
 from functions.functionsBot import compareImages
 
+emojis = ('🐣', '🦛', '🦆', '🐛', '😎', '🤪')
 import os
 from time import sleep
 
@@ -33,7 +34,7 @@ if isOnline():
         if currentGame not in gamesPlayed and currentGame != 'Just Chatting':
             gamesPlayed.append(currentGame)
     except Exception as err:
-        print(f'Erro na função isOnline: {err}')
+        print(f'❌ Erro na função isOnline: {err}')
         print('Setando game para Just Chatting...')
         currentGame = 'Just Chatting'
 
@@ -70,19 +71,18 @@ async def checkGame():
             except:
                 return
             status1 = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
-            status2 = ''
-            status3 = ''
+            # status2 = ''
+            # status3 = ''
             for game in gamesPlayed:
                 status1 += f' • {game}\n'
                 listStatus[0] = status1
         
-            last = list(listStatus)[-1]
-            listStatus[last] += f'\nVOD: {getVideo()}'
+            # last = list(listStatus)[-1]
+            status1 += f'\nVOD: {getVideo()["link"]}'
         
-            for status in listStatus:
-                tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
-                api.update_status(listStatus[status], in_reply_to_status_id=tweetId)
-                sleep(5)
+            tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
+            api.update_status(status1, in_reply_to_status_id=tweetId)
+            sleep(5)
             return
         
     if isOnline():
@@ -97,10 +97,10 @@ async def checkGame():
         
         if game != currentGame:
             currentGame = game
-
+            print(f'☑️ Cellbit trocou de jogo! {game}')
 
             textPost = f'Cellbit está jogando: {game}\nMinutagem no VOD: ~{timestampVod} \nhttps://twitch.tv/cellbit'
-            textTimestamp = f'Link do VOD: {getVideo()}?t={timestampVod}'
+            textTimestamp = f'Link do VOD: {getVideo()["link"]}?t={timestampVod}'
 
             try:
                 getImageGame(game)
@@ -116,9 +116,11 @@ async def checkGame():
             
             tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
             api.update_status(textTimestamp, in_reply_to_status_id = tweetId)
+            print('☑️ Tweet postado com sucesso!')
             
-            gamesBlacklist = ['Just Chatting', 'Watch Party']
-            if game in gamesBlacklist and game not in gamesPlayed:
+            gamesBlacklist = ('Just Chatting', 'Watch Party')
+            if game not in gamesBlacklist and game not in gamesPlayed:
                 gamesPlayed.append(game)
+                print(f'☑️ Jogo adicionado na lista! {game}')
 
 bot.run("OTY4MTkzMzE0NTk3Nzc3NDc5.YmbSSg.IKhoiWVe7GWtFWncUGrBJ07304Q")

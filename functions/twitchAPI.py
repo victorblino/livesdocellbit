@@ -104,31 +104,29 @@ def getVideo():
         f'https://api.twitch.tv/helix/videos?', headers=headers, params=params)
     responseText = response.text
     responseJson = json.loads(responseText)
-    return responseJson['data'][0]['url']
+    
+    for videos in responseJson['data']:
+        if videos['type'] == 'archive':
+            link = videos['url']
+            started_at = videos['created_at']
+            return {
+                'link': link,
+                'started_at': started_at
+            }
 
 def dateStream():
     import datetime
     import dateutil.parser
 
-    params = {
-            'user_id': '28579002',
-        }
-
-    response = requests.get(
-            f'https://api.twitch.tv/helix/videos?', headers=headers, params=params)
-    responseText = response.text
-    responseJson = json.loads(responseText)
-    started_at = responseJson['data'][0]['created_at']
+    started_at = getVideo()['started_at']
 
     parsedDate = dateutil.parser.isoparse(started_at)
     parsedDate = str(parsedDate).split("+", 1)
     parsedDate = parsedDate[0]
     parsedDate = datetime.datetime.strptime(parsedDate, "%Y-%m-%d %H:%M:%S")
-    parsedDate = str(parsedDate.date())
-    date = datetime.datetime.strptime(parsedDate, "%Y-%m-%d")
 
     return {
-        'day': date.day,
-        'month': date.month,
-        'year': date.year
+        'day': parsedDate.day,
+        'month': parsedDate.month,
+        'year': parsedDate.year
     }
