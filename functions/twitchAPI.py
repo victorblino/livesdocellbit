@@ -1,9 +1,15 @@
 import requests
 import json
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+bearer = os.environ.get('TWITCH_BEARER')
+client_id = os.environ.get('TWITCH_APP_ID')
 
 headers = {
-    'Authorization': 'Bearer i21v12z4c2te3d5ebq064y0yc2dz6y',
-    'Client-Id': 'g5zg0400k4vhrx2g6xi4hgveruamlv',
+    'Authorization': f'Bearer {bearer}',
+    'Client-Id': f'{client_id}',
 }
 
 params = {

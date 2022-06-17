@@ -1,126 +1,143 @@
-from functions.twitchAPI import getStream, isOnline, getImageGame, getVideo, dateStream
-from functions.functionsBot import compareImages
-
-emojis = ('🐣', '🦛', '🦆', '🐛', '😎', '🤪')
 import os
-from time import sleep
-
-import discord
-from discord.ext import tasks
-
 import tweepy
+from twitchAPI import Twitch, EventSub
+from dotenv import load_dotenv
+from time import sleep
+from functions.functionsBot import compareImages
+from functions.twitchAPI import getStream, dateStream, getVideo
 
-global currentGame, online, gamesPlayed
+# load env variables
+load_dotenv()
+
+# env variables 
+WEBHOOK_URL = os.environ.get('WEBHOOK_URL')
+APP_ID = os.environ.get('TWITCH_APP_ID')
+APP_SECRET = os.environ.get('TWITCH_APP_SECRET')
+ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN')
+ACCESS_SECRET = os.environ.get('TWITTER_ACCESS_SECRET')
+CONSUMER_KEY = os.environ.get('TWITTER_CONSUMER_KEY')
+CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET')
+
+TARGET_USERNAME = os.environ.get('TARGET_USERNAME')
+
+# global variables
+currentGame = None
+currentTitle = None
+online = False
 gamesPlayed = list()
 
-auth = tweepy.OAuthHandler("GPRorX0IZ7wp4s9EcmD1Y3Vzp", "icHW0EvWkmbPXZUoukUZY2ow9BAeiGvKrMwdWm9zlZiNJ926z7")
-auth.set_access_token("1278567210991210502-sEmyQXOYI4HMPBHxYP2MEzo9RKKGuQ", "o4uhnyVCnuq5INQc3EqGpLEeGvf5JaJPzdgjtuURwCvZY")
+# login in twitch api
+twitch = Twitch(APP_ID, APP_SECRET)
+twitch.authenticate_app([])
+
+# twitter authentication
+auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 api = tweepy.API(auth)
 
 try:
     api.verify_credentials()
-    print("Authentication Successful")
+    print('Authentication Successful')
 except:
-    print("Authentication Error")
+    print('Authentication Error')
 
-online = False
-currentGame = None
-bot = discord.Bot()
+# get the user_id from twitch user
+uid = twitch.get_users(logins=[TARGET_USERNAME])
+user_id = uid['data'][0]['id']
+currentTitle = twitch.get_channel_information(user_id)['data'][0]['title']
 
-if isOnline():
-    try:
-        currentGame = getStream()['game']
-        online = True
-        if currentGame not in gamesPlayed and currentGame != 'Just Chatting':
-            gamesPlayed.append(currentGame)
-    except Exception as err:
-        print(f'❌ Erro na função isOnline: {err}')
-        print('Setando game para Just Chatting...')
-        currentGame = 'Just Chatting'
+# get the informations
+try:
+    stream = twitch.get_streams(user_id=user_id)
+    currentGame = stream['data'][0]['game_name']
+    currentTitle = stream['data'][0]['title']
+    online = True
+except:
+    online = False
 
-@bot.event
-async def on_ready():
-    print('Online!')
-    checkGame.start()
-
-
-@tasks.loop(seconds=15)
-async def checkGame():
+# functions callbacks
+async def stream_online(data: dict):
     global online, currentGame
-    if isOnline() == True and online == False:
-        try: 
-            title = getStream()['title']
-        except Exception as err: 
-            print(f'Erro na função isOnline: {err}')
-            print('Setando game como Just Chatting...')
-            currentGame = 'Just Chatting'
-            return
-        api.update_status(f'Cellbit entrou ao vivo!\nTítulo: {title}\nhttps://twitch.tv/cellbit')
-        online = True
-        pass
+    sleep(5)
+    stream = twitch.get_streams(user_id=user_id)
+    title = stream['data'][0]['title']
+    currentGame = stream['data'][0]['game_name']
+    api.update_status(f'Cellbit entrou ao vivo!\n\n {title}')
+    online = True
 
-    if online == True and isOnline() == False:
-        status = 'Cellbit encerrou a live!'
-        api.update_status(status)
-        online = False
-        listStatus = dict()
-        
-        if len(gamesPlayed) > 0:
-            try:
-                date = dateStream()
-            except:
-                return
-            status1 = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
-            # status2 = ''
-            # status3 = ''
-            for game in gamesPlayed:
-                status1 += f' • {game}\n'
-                listStatus[0] = status1
-        
-            # last = list(listStatus)[-1]
-            status1 += f'\nVOD: {getVideo()["link"]}'
-        
-            tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
-            api.update_status(status1, in_reply_to_status_id=tweetId)
-            sleep(5)
-            return
-        
-    if isOnline():
+async def stream_offline(data: dict):
+    global online
+    api.update_status('Cellbit encerrou a live!')
+    online = False
+    sleep(5)
 
+    if len(gamesPlayed) > 0:
         try:
-            infos = getStream()
+            date = dateStream()
         except:
             return
+        status = f"[{date['day']}/{date['month']}/{date[year]}] Games Jogados:\n\n"
+        for game in gamesPlayed:
+            status += f'• {game}'
+        status += f'VOD: {getVideo()["link"]}'
+        tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
+        api.update_status(status, in_reply_to_status_id = tweetId)
+        return 
 
-        game = infos['game']
-        timestampVod = f'{infos["vodHours"]}h{infos["vodMinutes"]}m{infos["vodSeconds"]}s'
-        
-        if game != currentGame:
-            currentGame = game
-            print(f'☑️ Cellbit trocou de jogo! {game}')
+async def channel_update(data: dict):
+    global currentGame, currentTitle, gamesPlayed
 
-            textPost = f'Cellbit está jogando: {game}\nMinutagem no VOD: ~{timestampVod} \nhttps://twitch.tv/cellbit'
-            textTimestamp = f'Link do VOD: {getVideo()["link"]}?t={timestampVod}'
+    game = data['event']['category_name']
+    title = data['event']['title']
 
-            try:
-                getImageGame(game)
-                sleep(2)
-                if compareImages():
-                    api.update_status(textPost)
-                else:
-                    api.update_status_with_media(textPost, 'gameImg.jpg')
-            except:
-                api.update_status(textPost)
-
-            sleep(3)
-            
-            tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
-            api.update_status(textTimestamp, in_reply_to_status_id = tweetId)
-            print('☑️ Tweet postado com sucesso!')
-            
-            gamesBlacklist = ('Just Chatting', 'Watch Party')
-            if game not in gamesBlacklist and game not in gamesPlayed:
+    if game != currentGame and online == True:
+        stream = twitch.get_streams(user_id=user_id)
+        timeVod = getStream()
+        h, m, s = timeVod['vodHours'], timeVod['vodMinutes'], timeVod['vodSeconds']
+        try:
+            import urllib.request
+            imageUrl = twitch.get_games(names=game)['data'][0]['box_art_url'].replace('{width}', '800').replace('{height}', '800')
+            urllib.request.urlretrieve(imageUrl, 'gameImg.jpg')
+            status = f'Cellbit está jogando {game}\nTempo no VOD: {h}h {m}m {s}s'
+            if compareImages():
+                api.update_status(f'Cellbit está jogando: {game}')
+            else: 
+                api.update_status_with_media(f'Cellbit está jogando: {game}\nTempo no VOD: {h}h {m}m {s}s', 'gameImg.jpg')
+        except:
+            api.update_status(f'Cellbit está jogando: {game}\nTempo no VOD: {h}h {m}m {s}s')
+        finally:
+            gamesBlacklist = ('Just Chatting', 'Watch Parties')
+            if game not in gamesPlayed and game not in gamesBlacklist:
                 gamesPlayed.append(game)
-                print(f'☑️ Jogo adicionado na lista! {game}')
+            currentGame = game
 
-bot.run("OTY4MTkzMzE0NTk3Nzc3NDc5.YmbSSg.IKhoiWVe7GWtFWncUGrBJ07304Q")
+        sleep(3)
+        link = getVideo()['link']
+        tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
+        api.update_status(f'Link do VOD: {link}?t={h}h{m}m{s}s', in_reply_to_status_id = tweetId)
+        
+    if title != currentTitle and online == False:
+        api.update_status(f'[TÍTULO] {title}')
+        currentTitle = title
+
+# subscribe to EventSub
+hook = EventSub(WEBHOOK_URL, APP_ID, 8080, twitch)
+hook.unsubscribe_all()
+hook.start()
+
+print('Iniciando webhooks...\n')
+try: 
+    hook.listen_channel_update(user_id, channel_update)
+    print('[OK] CHANNEL UPDATE - WEBHOOK')
+    hook.listen_stream_offline(user_id, stream_offline)
+    print('[OK] STREAM OFFLINE - WEBHOOK')
+    hook.listen_stream_online(user_id, stream_online)
+    print('[OK] STREAM ONLINE - WEBHOOK')
+    print('\n')
+except Exception as error:
+    print(f'Erro! {error}')
+
+try:
+    input('Online! Aperte ENTER para sair.\n')
+finally:
+    hook.stop()
