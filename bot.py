@@ -1,15 +1,12 @@
 import os
 import tweepy
+import logging
+import threading
 from twitchAPI import Twitch, EventSub
 from dotenv import load_dotenv
-from time import sleep
 from functions.functionsBot import compareImages
 from functions.twitchAPI import getStream, dateStream, getVideo
-
-#logging
-import logging
-
-logging.basicConfig(level=logging.INFO)
+from asyncio import sleep 
 
 # load env variables
 load_dotenv()
@@ -24,12 +21,17 @@ CONSUMER_KEY = os.environ.get('TWITTER_CONSUMER_KEY')
 CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET')
 PORT = os.environ.get('PORT', 8080)
 TARGET_USERNAME = os.environ.get('TARGET_USERNAME')
+LOGGING = os.environ.get('LOGGING')
+
+if LOGGING == 'TRUE':
+    logging.basicConfig(level=logging.INFO)
 
 # global variables
 currentGame = None
 currentTitle = None
 online = False
 gamesPlayed = list()
+forever = threading.Event()
 
 # login in twitch api
 twitch = Twitch(APP_ID, APP_SECRET)
@@ -143,6 +145,7 @@ except Exception as error:
     print(f'Erro! {error}')
 
 try:
-    input('Online! Aperte ENTER para sair.\n')
+    forever.wait()
+    print('Rodando!')
 finally:
     hook.stop()
