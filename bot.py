@@ -31,6 +31,7 @@ currentGame = None
 currentTitle = None
 online = False
 gamesPlayed = list()
+gamesBlacklist = ('Just Chatting', 'Watch Parties')
 forever = threading.Event()
 
 # login in twitch api
@@ -58,6 +59,8 @@ try:
     stream = twitch.get_streams(user_id=user_id)
     currentGame = stream['data'][0]['game_name']
     currentTitle = stream['data'][0]['title']
+    if currentGame not in gamesPlayed and currentGame not in gamesPlayed:
+        gamesPlayed.append(currentGame)
     online = True
 except:
     online = False
@@ -69,7 +72,7 @@ async def stream_online(data: dict):
     stream = twitch.get_streams(user_id=user_id)
     title = stream['data'][0]['title']
     currentGame = stream['data'][0]['game_name']
-    api.update_status(f'Cellbit entrou ao vivo!\n\n {title}')
+    api.update_status(f'Cellbit entrou ao vivo!\n\nTítulo: {title}\ntwitch.tv/cellbit')
     online = True
 
 async def stream_offline(data: dict):
@@ -113,7 +116,6 @@ async def channel_update(data: dict):
         except:
             api.update_status(f'Cellbit está jogando: {game}\nTempo no VOD: {h}h {m}m {s}s')
         finally:
-            gamesBlacklist = ('Just Chatting', 'Watch Parties')
             if game not in gamesPlayed and game not in gamesBlacklist:
                 gamesPlayed.append(game)
             currentGame = game
