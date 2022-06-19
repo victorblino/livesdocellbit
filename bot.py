@@ -6,6 +6,11 @@ from time import sleep
 from functions.functionsBot import compareImages
 from functions.twitchAPI import getStream, dateStream, getVideo
 
+#logging
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
 # load env variables
 load_dotenv()
 
@@ -17,7 +22,7 @@ ACCESS_TOKEN = os.environ.get('TWITTER_ACCESS_TOKEN')
 ACCESS_SECRET = os.environ.get('TWITTER_ACCESS_SECRET')
 CONSUMER_KEY = os.environ.get('TWITTER_CONSUMER_KEY')
 CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET')
-
+PORT = os.environ.get('PORT', 8080)
 TARGET_USERNAME = os.environ.get('TARGET_USERNAME')
 
 # global variables
@@ -121,7 +126,7 @@ async def channel_update(data: dict):
         currentTitle = title
 
 # subscribe to EventSub
-hook = EventSub(WEBHOOK_URL, APP_ID, 8080, twitch)
+hook = EventSub(WEBHOOK_URL, APP_ID, PORT, twitch)
 hook.unsubscribe_all()
 hook.start()
 
