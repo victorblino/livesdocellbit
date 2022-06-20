@@ -85,7 +85,7 @@ async def stream_offline(data: dict):
             date = dateStream()
         except:
             return
-        status = f"[{date['day']}/{date['month']}/{date[year]}] Games Jogados:\n\n"
+        status = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
         for game in gamesPlayed:
             status += f'• {game}'
         status += f'VOD: {getVideo()["link"]}'
