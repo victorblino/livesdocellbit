@@ -46,7 +46,7 @@ api = tweepy.API(auth)
 try:
     api.verify_credentials()
     print('Authentication Successful')
-except:
+except Exception:
     print('Authentication Error')
 
 # get the user_id from twitch user
@@ -62,7 +62,7 @@ try:
     if currentGame not in gamesPlayed and currentGame not in gamesPlayed:
         gamesPlayed.append(currentGame)
     online = True
-except:
+except Exception:
     online = False
 
 # functions callbacks
@@ -83,7 +83,7 @@ async def stream_offline(data: dict):
     if len(gamesPlayed) > 0:
         try:
             date = dateStream()
-        except:
+        except Exception:
             return
         status = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
         for game in gamesPlayed:
@@ -112,7 +112,7 @@ async def channel_update(data: dict):
                 api.update_status(status)
             else: 
                 api.update_status_with_media(status, 'gameImg.jpg')
-        except:
+        except Exception:
             api.update_status(status)
         finally:
             if game not in gamesPlayed and game not in gamesBlacklist:
