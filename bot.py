@@ -46,7 +46,7 @@ api = tweepy.API(auth)
 try:
     api.verify_credentials()
     print('Authentication Successful')
-except Exception:
+except:
     print('Authentication Error')
 
 # get the user_id from twitch user
@@ -62,13 +62,12 @@ try:
     if currentGame not in gamesPlayed and currentGame not in gamesPlayed:
         gamesPlayed.append(currentGame)
     online = True
-except Exception:
+except:
     online = False
 
 # functions callbacks
 async def stream_online(data: dict):
     global online, currentGame
-    sleep(5)
     stream = twitch.get_streams(user_id=user_id)
     title = stream['data'][0]['title']
     currentGame = stream['data'][0]['game_name']
@@ -83,7 +82,7 @@ async def stream_offline(data: dict):
     if len(gamesPlayed) > 0:
         try:
             date = dateStream()
-        except Exception:
+        except:
             return
         status = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
         for game in gamesPlayed:
@@ -91,7 +90,6 @@ async def stream_offline(data: dict):
         status += f'VOD: {getVideo()["link"]}'
         tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
         api.update_status(status, in_reply_to_status_id = tweetId)
-        return 
 
 async def channel_update(data: dict):
     global currentGame, currentTitle, gamesPlayed
@@ -112,14 +110,14 @@ async def channel_update(data: dict):
                 api.update_status(status)
             else: 
                 api.update_status_with_media(status, 'gameImg.jpg')
-        except Exception:
+        except:
             api.update_status(status)
         finally:
             if game not in gamesPlayed and game not in gamesBlacklist:
                 gamesPlayed.append(game)
             currentGame = game
 
-        sleep(3)
+        sleep(1)
         link = getVideo()['link']
         tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
         api.update_status(f'Link do VOD: {link}?t={h}h{m}m{s}s', in_reply_to_status_id = tweetId)
