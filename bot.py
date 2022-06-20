@@ -31,6 +31,7 @@ currentGame = None
 currentTitle = None
 online = False
 gamesPlayed = list()
+gamesBlacklist = ('Just Chatting', 'Watch Parties')
 forever = threading.Event()
 
 # login in twitch api
@@ -58,6 +59,8 @@ try:
     stream = twitch.get_streams(user_id=user_id)
     currentGame = stream['data'][0]['game_name']
     currentTitle = stream['data'][0]['title']
+    if currentGame not in gamesPlayed and currentGame not in gamesPlayed:
+        gamesPlayed.append(currentGame)
     online = True
 except Exception:
     online = False
@@ -69,14 +72,13 @@ async def stream_online(data: dict):
     stream = twitch.get_streams(user_id=user_id)
     title = stream['data'][0]['title']
     currentGame = stream['data'][0]['game_name']
-    api.update_status(f'Cellbit entrou ao vivo!\n\n {title}')
+    api.update_status(f'Cellbit entrou ao vivo!\n\nTítulo: {title}\ntwitch.tv/cellbit')
     online = True
 
 async def stream_offline(data: dict):
     global online
     api.update_status('Cellbit encerrou a live!')
     online = False
-    sleep(5)
 
     if len(gamesPlayed) > 0:
         try:
@@ -98,7 +100,7 @@ async def channel_update(data: dict):
     title = data['event']['title']
 
     if game != currentGame and online == True:
-        stream = twitch.get_streams(user_id=user_id)
+        # stream = twitch.get_streams(user_id=user_id)
         timeVod = getStream()
         h, m, s = timeVod['vodHours'], timeVod['vodMinutes'], timeVod['vodSeconds']
         try:
@@ -107,13 +109,12 @@ async def channel_update(data: dict):
             urllib.request.urlretrieve(imageUrl, 'gameImg.jpg')
             status = f'Cellbit está jogando {game}\nTempo no VOD: {h}h {m}m {s}s'
             if compareImages():
-                api.update_status(f'Cellbit está jogando: {game}')
+                api.update_status(status)
             else: 
-                api.update_status_with_media(f'Cellbit está jogando: {game}\nTempo no VOD: {h}h {m}m {s}s', 'gameImg.jpg')
+                api.update_status_with_media(status, 'gameImg.jpg')
         except Exception:
-            api.update_status(f'Cellbit está jogando: {game}\nTempo no VOD: {h}h {m}m {s}s')
+            api.update_status(status)
         finally:
-            gamesBlacklist = ('Just Chatting', 'Watch Parties')
             if game not in gamesPlayed and game not in gamesBlacklist:
                 gamesPlayed.append(game)
             currentGame = game
@@ -145,7 +146,7 @@ except Exception as error:
     print(f'Erro! {error}')
 
 try:
-    forever.wait()
     print('Rodando!')
+    forever.wait()
 finally:
     hook.stop()
