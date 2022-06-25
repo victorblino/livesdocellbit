@@ -2,9 +2,10 @@ import os
 import tweepy
 import logging
 import threading
+import io
 from twitchAPI import Twitch, EventSub
 from dotenv import load_dotenv
-from functions.functionsBot import compareImages
+from functions.functionsBot import isNotFound
 from functions.twitchAPI import getStream, dateStream, getVideo
 from asyncio import sleep 
 
@@ -104,12 +105,12 @@ async def channel_update(data: dict):
         try:
             import urllib.request
             imageUrl = twitch.get_games(names=game)['data'][0]['box_art_url'].replace('{width}', '800').replace('{height}', '800')
-            urllib.request.urlretrieve(imageUrl, 'gameImg.jpg')
+            imageBytes = io.BytesIO(urllib.request.urlopen(imageUrl).read())
             status = f'Cellbit está jogando {game}\nTempo no VOD: {h}h {m}m {s}s'
-            if compareImages():
+            if isNotFound(imageBytes):
                 api.update_status(status)
             else: 
-                api.update_status_with_media(status, 'gameImg.jpg')
+                api.update_status_with_media(status, 'gameImg.jpg', file=imageBytes)
         except:
             api.update_status(status)
         finally:
