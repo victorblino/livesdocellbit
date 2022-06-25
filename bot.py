@@ -59,7 +59,7 @@ try:
     stream = twitch.get_streams(user_id=user_id)
     currentGame = stream['data'][0]['game_name']
     currentTitle = stream['data'][0]['title']
-    if currentGame not in gamesPlayed and currentGame not in gamesPlayed:
+    if currentGame not in gamesBlacklist:
         gamesPlayed.append(currentGame)
     online = True
 except:
@@ -86,7 +86,7 @@ async def stream_offline(data: dict):
             return
         status = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
         for game in gamesPlayed:
-            status += f'• {game}'
+            status += f'• {game}\n'
         status += f'VOD: {getVideo()["link"]}'
         tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
         api.update_status(status, in_reply_to_status_id = tweetId)
