@@ -87,7 +87,7 @@ async def stream_offline(data: dict):
         status = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
         for game in gamesPlayed:
             status += f'• {game}\n'
-        status += f'VOD: {getVideo()["link"]}'
+        status += f'\nVOD: {getVideo()["link"]}'
         tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
         api.update_status(status, in_reply_to_status_id = tweetId)
         gamesPlayed = []
