@@ -31,7 +31,7 @@ currentGame = None
 currentTitle = None
 online = False
 gamesPlayed = list()
-gamesBlacklist = ['Just Chatting', 'Watch Parties']
+gamesBlacklist = ('Just Chatting', 'Watch Parties', 'Tabletop RPGs')
 forever = threading.Event()
 
 # login in twitch api
@@ -90,7 +90,7 @@ async def stream_offline(data: dict):
         status += f'\nVOD: {getVideo()["link"]}'
         tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
         api.update_status(status, in_reply_to_status_id = tweetId)
-        gamesPlayed = []
+        gamesPlayed = list()
 
 async def channel_update(data: dict):
     global currentGame, currentTitle, gamesPlayed
