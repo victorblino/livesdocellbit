@@ -86,7 +86,7 @@ def getImageGame(game):
     responseText = response.text
     responseJson = json.loads(responseText)
     
-    imageUrl = responseJson['data'][0]['box_art_url'].replace('{width}', '600').replace('{height}', '800')
+    imageUrl = responseJson['data'][0]['box_art_url'].replace('{width}', '800').replace('{height}', '600')
 
     urllib.request.urlretrieve(imageUrl, 'gameImg.jpg')
 
