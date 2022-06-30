@@ -133,16 +133,15 @@ hook.unsubscribe_all()
 hook.start()
 
 print('Iniciando webhooks...\n')
-try: 
-    hook.listen_channel_update(user_id, channel_update)
-    print('[OK] CHANNEL UPDATE - WEBHOOK')
-    hook.listen_stream_offline(user_id, stream_offline)
-    print('[OK] STREAM OFFLINE - WEBHOOK')
-    hook.listen_stream_online(user_id, stream_online)
-    print('[OK] STREAM ONLINE - WEBHOOK')
-    print('\n')
-except Exception as error:
-    print(f'Erro! {error}')
+
+hook.listen_channel_update(user_id, channel_update)
+print('[OK] CHANNEL UPDATE - WEBHOOK')
+hook.listen_stream_offline(user_id, stream_offline)
+print('[OK] STREAM OFFLINE - WEBHOOK')
+hook.listen_stream_online(user_id, stream_online)
+print('[OK] STREAM ONLINE - WEBHOOK')
+print('\n')
+
 
 try:
     print('Rodando!')
