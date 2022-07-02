@@ -104,7 +104,7 @@ async def channel_update(data: dict):
         h, m, s = timeVod['vodHours'], timeVod['vodMinutes'], timeVod['vodSeconds']
         try:
             import urllib.request
-            imageUrl = twitch.get_games(names=game)['data'][0]['box_art_url'].replace('{width}', '800').replace('{height}', '800')
+            imageUrl = twitch.get_games(names=game)['data'][0]['box_art_url'].replace('{width}', '600').replace('{height}', '800')
             urllib.request.urlretrieve(imageUrl, 'gameImg.jpg')
             status = f'Cellbit está jogando {game}\nTempo no VOD: {h}h {m}m {s}s'
             if compareImages():
