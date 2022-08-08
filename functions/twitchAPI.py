@@ -115,9 +115,11 @@ def getVideo():
         if videos['type'] == 'archive':
             link = videos['url']
             started_at = videos['created_at']
+            title = videos['title']
             return {
                 'link': link,
-                'started_at': started_at
+                'started_at': started_at,
+                'title': title,
             }
 
 def dateStream():

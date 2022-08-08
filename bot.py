@@ -6,7 +6,7 @@ from twitchAPI import Twitch, EventSub
 from dotenv import load_dotenv
 from functions.functionsBot import compareImages
 from functions.twitchAPI import getStream, dateStream, getVideo
-from asyncio import sleep 
+from asyncio import sleep
 
 # load env variables
 load_dotenv()
@@ -29,6 +29,7 @@ if LOGGING == 'TRUE':
 # global variables
 currentGame = None
 currentTitle = None
+streamId = None
 online = False
 gamesPlayed = list()
 gamesBlacklist = ('Just Chatting', 'Watch Parties', 'Tabletop RPGs')
@@ -59,6 +60,7 @@ try:
     stream = twitch.get_streams(user_id=user_id)
     currentGame = stream['data'][0]['game_name']
     currentTitle = stream['data'][0]['title']
+    streamId = stream['data'][0]['id']
     if currentGame not in gamesBlacklist:
         gamesPlayed.append(currentGame)
     online = True
@@ -67,10 +69,11 @@ except:
 
 # functions callbacks
 async def stream_online(data: dict):
-    global online, currentGame
+    global online, currentGame, streamId
     stream = twitch.get_streams(user_id=user_id)
     title = stream['data'][0]['title']
     currentGame = stream['data'][0]['game_name']
+    streamId = stream['data'][0]['id']
     api.update_status(f'Cellbit entrou ao vivo!\n\nTítulo: {title}\ntwitch.tv/cellbit')
     online = True
 
@@ -80,15 +83,16 @@ async def stream_offline(data: dict):
     online = False
 
     if len(gamesPlayed) > 0:
-        try:
-            date = dateStream()
-        except:
-            return
+        tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
+
+        date = dateStream()
         status = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
         for game in gamesPlayed:
             status += f'• {game}\n'
-        status += f'\nVOD: {getVideo()["link"]}'
-        tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
+        if getVideo['title'] != currentTitle:
+            status += f'\nVOD: https://twitchtracker.com/cellbit/streams/{streamId}'
+        else:
+            status += f'\nVOD: {getVideo()["link"]}'
         api.update_status(status, in_reply_to_status_id = tweetId)
         gamesPlayed = list()
 
@@ -106,8 +110,8 @@ async def channel_update(data: dict):
             import urllib.request
             imageUrl = twitch.get_games(names=game)['data'][0]['box_art_url'].replace('{width}', '600').replace('{height}', '800')
             urllib.request.urlretrieve(imageUrl, 'gameImg.jpg')
-            status = f'Cellbit está jogando {game}\nTempo no VOD: {h}h {m}m {s}s'
-            if compareImages():
+            status = f'Cellbit está jogando: {game}\nTempo no VOD: {h}h{m}m{s}s\n\ntwitch.tv/cellbit'
+            if compareImages() or game == 'Just Chatting':
                 api.update_status(status)
             else: 
                 api.update_status_with_media(status, 'gameImg.jpg')
@@ -118,11 +122,8 @@ async def channel_update(data: dict):
                 gamesPlayed.append(game)
             currentGame = game
 
-        sleep(1)
-        link = getVideo()['link']
-        tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
-        api.update_status(f'Link do VOD: {link}?t={h}h{m}m{s}s', in_reply_to_status_id = tweetId)
-        
+        # sleep(1)
+        #  infoVideo = getVideo()        
     if title != currentTitle and online == False:
         api.update_status(f'[TÍTULO] {title}')
         currentTitle = title
