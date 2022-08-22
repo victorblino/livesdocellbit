@@ -33,6 +33,10 @@ streamId = None
 online = False
 gamesPlayed = list()
 gamesBlacklist = ('Just Chatting', 'Watch Parties', 'Tabletop RPGs')
+gamesTranslate = {
+    'Just Chatting': 'Só na conversa',
+    'Wordle': 'Raios Funde Letreco Musicle Posterdle Musicle Gamer'
+}
 forever = threading.Event()
 
 # login in twitch api
@@ -89,10 +93,7 @@ async def stream_offline(data: dict):
         status = f"[{date['day']}/{date['month']}/{date['year']}] Games Jogados:\n\n"
         for game in gamesPlayed:
             status += f'• {game}\n'
-        if getVideo['title'] != currentTitle:
-            status += f'\nVOD: https://twitchtracker.com/cellbit/streams/{streamId}'
-        else:
-            status += f'\nVOD: {getVideo()["link"]}'
+        status += f'\nVOD (Twitch Tracker): https://twitchtracker.com/cellbit/streams/{streamId}'
         api.update_status(status, in_reply_to_status_id = tweetId)
         gamesPlayed = list()
 
@@ -110,10 +111,16 @@ async def channel_update(data: dict):
             import urllib.request
             imageUrl = twitch.get_games(names=game)['data'][0]['box_art_url'].replace('{width}', '600').replace('{height}', '800')
             urllib.request.urlretrieve(imageUrl, 'gameImg.jpg')
-            status = f'Cellbit está jogando: {game}\nTempo no VOD: {h}h{m}m{s}s\n\ntwitch.tv/cellbit'
-            if compareImages() or game == 'Just Chatting':
+            if game not in gamesTranslate:
+                status = f'Cellbit está jogando: {game}\nTempo no VOD: {h}h{m}m{s}s\n\ntwitch.tv/cellbit'
+            else:
+                status = f'Cellbit está jogando: {gamesTranslate[game]}\nTempo no VOD: {h}h{m}m{s}s\n\ntwitch.tv/cellbit'
+
+            if compareImages() or game in gamesBlacklist:
                 api.update_status(status)
-            else: 
+            elif game == 'Wordle':
+                urllib.request.urlretrieve('https://i.imgur.com/IfcsMel.png', 'gameImg.jpg')
+            else:
                 api.update_status_with_media(status, 'gameImg.jpg')
         except:
             api.update_status(status)
