@@ -11,7 +11,7 @@ from asyncio import sleep
 # load env variables
 load_dotenv()
 
-# env variables 
+# env variables
 WEBHOOK_URL = os.environ.get('WEBHOOK_URL')
 APP_ID = os.environ.get('TWITCH_APP_ID')
 APP_SECRET = os.environ.get('TWITCH_APP_SECRET')
@@ -73,14 +73,18 @@ except:
     online = False
 
 # functions callbacks
+
+
 async def stream_online(data: dict):
     global online, currentGame, streamId
     stream = twitch.get_streams(user_id=user_id)
     title = stream['data'][0]['title']
     currentGame = stream['data'][0]['game_name']
     streamId = stream['data'][0]['id']
-    api.update_status(f'Cellbit entrou ao vivo!\n\nTítulo: {title}\ntwitch.tv/cellbit')
+    api.update_status(
+        f'Cellbit entrou ao vivo!\n\nTítulo: {title}\ntwitch.tv/cellbit')
     online = True
+
 
 async def stream_offline(data: dict):
     global online, gamesPlayed
@@ -96,8 +100,9 @@ async def stream_offline(data: dict):
         for game in gamesPlayed:
             status += f'• {game}\n'
         status += f'\nVOD (Twitch Tracker): https://twitchtracker.com/cellbit/streams/{streamId}'
-        api.update_status(status, in_reply_to_status_id = tweetId)
+        api.update_status(status, in_reply_to_status_id=tweetId)
         gamesPlayed = list()
+
 
 async def channel_update(data: dict):
     global currentGame, currentTitle, gamesPlayed
@@ -111,19 +116,22 @@ async def channel_update(data: dict):
         h, m, s = timeVod['vodHours'], timeVod['vodMinutes'], timeVod['vodSeconds']
         try:
             import urllib.request
-            imageUrl = twitch.get_games(names=game)['data'][0]['box_art_url'].replace('{width}', '600').replace('{height}', '800')
+            imageUrl = twitch.get_games(names=game)['data'][0]['box_art_url'].replace(
+                '{width}', '600').replace('{height}', '800')
             urllib.request.urlretrieve(imageUrl, 'gameImg.jpg')
+            if game == 'Wordle':
+                urllib.request.urlretrieve(
+                    'https://i.imgur.com/IfcsMel.png', 'gameImg.jpg')
             if game not in gamesTranslate:
                 status = f'Cellbit está jogando: {game}\nTempo no VOD: {h}h{m}m{s}s\n\ntwitch.tv/cellbit'
                 sendWebhook(WEBHOOK_PDE, f'Cellbit está jogando {game}')
             else:
                 status = f'Cellbit está jogando: {gamesTranslate[game]}\nTempo no VOD: {h}h{m}m{s}s\n\ntwitch.tv/cellbit'
-                sendWebhook(WEBHOOK_PDE, f'Cellbit está jogando {gamesTranslate[game]}')
+                sendWebhook(
+                    WEBHOOK_PDE, f'Cellbit está jogando {gamesTranslate[game]}')
 
             if compareImages() or game in gamesBlacklist:
                 api.update_status(status)
-            elif game == 'Wordle':
-                urllib.request.urlretrieve('https://i.imgur.com/IfcsMel.png', 'gameImg.jpg')
             else:
                 api.update_status_with_media(status, 'gameImg.jpg')
         except:
@@ -134,7 +142,7 @@ async def channel_update(data: dict):
             currentGame = game
 
         # sleep(1)
-        #  infoVideo = getVideo()        
+        #  infoVideo = getVideo()
     if title != currentTitle and online == False:
         api.update_status(f'[TÍTULO] {title}')
         sendWebhook(WEBHOOK_PDE, f'[TÍTULO] {title}')
