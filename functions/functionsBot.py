@@ -1,3 +1,4 @@
+from discord_webhook import DiscordWebhook
 from base64 import b64encode
 
 def compareImages():
@@ -9,3 +10,7 @@ def compareImages():
             return True
         else:
             return False
+
+def sendWebhook(webhookUrl, message):
+    webhook = DiscordWebhook(url=webhookUrl, rate_limit_retry=True, content=message)
+    webhook.execute()
