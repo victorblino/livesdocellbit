@@ -23,6 +23,7 @@ PORT = os.environ.get('PORT', 8080)
 TARGET_USERNAME = os.environ.get('TARGET_USERNAME')
 LOGGING = os.environ.get('LOGGING')
 WEBHOOK_PDE = os.environ.get('WEBHOOK_PDE')
+WEBHOOK_OFFSTREAM = os.environ.get('WEBHOOK_OFFSTREAM')
 
 if LOGGING == 'TRUE':
     logging.basicConfig(level=logging.INFO)
@@ -38,6 +39,7 @@ gamesTranslate = {
     'Just Chatting': 'Só na conversa',
     'Wordle': 'Raios Funde Letreco Musicle Posterdle Musicle Gamer'
 }
+webhooks_urls = [WEBHOOK_PDE, WEBHOOK_OFFSTREAM]
 forever = threading.Event()
 
 # login in twitch api
@@ -89,7 +91,7 @@ async def stream_online(data: dict):
 async def stream_offline(data: dict):
     global online, gamesPlayed
     api.update_status('Cellbit encerrou a live!')
-    sendWebhook(WEBHOOK_PDE, 'Cellbit encerrou a live!')
+    sendWebhook(webhooks_urls, 'Cellbit encerrou a live!')
     online = False
 
     if len(gamesPlayed) > 0:
@@ -124,11 +126,11 @@ async def channel_update(data: dict):
                     'https://i.imgur.com/IfcsMel.png', 'gameImg.jpg')
             if game not in gamesTranslate:
                 status = f'Cellbit está jogando: {game}\nTempo no VOD: {h}h{m}m{s}s\n\ntwitch.tv/cellbit'
-                sendWebhook(WEBHOOK_PDE, f'Cellbit está jogando {game}')
+                sendWebhook(webhooks_urls, f'Cellbit está jogando {game}')
             else:
                 status = f'Cellbit está jogando: {gamesTranslate[game]}\nTempo no VOD: {h}h{m}m{s}s\n\ntwitch.tv/cellbit'
                 sendWebhook(
-                    WEBHOOK_PDE, f'Cellbit está jogando {gamesTranslate[game]}')
+                    webhooks_urls, f'Cellbit está jogando {gamesTranslate[game]}')
 
             if compareImages() or game in gamesBlacklist:
                 api.update_status(status)
@@ -145,7 +147,7 @@ async def channel_update(data: dict):
         #  infoVideo = getVideo()
     if title != currentTitle and online == False:
         api.update_status(f'[TÍTULO] {title}')
-        sendWebhook(WEBHOOK_PDE, f'[TÍTULO] {title}')
+        sendWebhook(webhooks_urls, f'[TÍTULO] {title}')
         currentTitle = title
 
 # subscribe to EventSub
