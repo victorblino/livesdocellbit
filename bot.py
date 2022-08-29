@@ -38,7 +38,6 @@ gamesTranslate = {
     'Just Chatting': 'Só na conversa',
     'Wordle': 'Raios Funde Letreco Musicle Posterdle Musicle Gamer'
 }
-WEBHOOKS_URLS = [WEBHOOK_PDE, WEBHOOK_OFFSTREAM]
 forever = threading.Event()
 
 # login in twitch api
