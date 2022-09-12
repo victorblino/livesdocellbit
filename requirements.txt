@@ -7,3 +7,4 @@ tweepy==4.10.0
 twitchAPI==2.5.5
 urllib3==1.26.9
 discord-webhook==0.17.0
+emoji==2.0.0

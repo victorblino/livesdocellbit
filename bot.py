@@ -1,12 +1,14 @@
 import os
-import tweepy
+import tweepy # pyright: ignore
 import logging
 import threading
-from twitchAPI import Twitch, EventSub
-from dotenv import load_dotenv
+from twitchAPI import Twitch, EventSub # pyright: ignore
+from dotenv import load_dotenv # pyright: ignore
 from functions.functionsBot import compareImages, sendWebhook
 from functions.twitchAPI import getStream, dateStream, getVideo
 from asyncio import sleep
+from emoji import emojize
+from random import choice
 
 # load env variables
 load_dotenv()
@@ -22,7 +24,7 @@ CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET')
 PORT = os.environ.get('PORT', 8080)
 TARGET_USERNAME = os.environ.get('TARGET_USERNAME')
 LOGGING = os.environ.get('LOGGING')
-WEBHOOKS_URLS= os.environ.get('WEBHOOKS_URLS').split(', ')
+WEBHOOKS_URLS= os.environ.get('WEBHOOKS_URLS').split(', ') # pyright: ignore
 
 if LOGGING == 'TRUE':
     logging.basicConfig(level=logging.INFO)
@@ -81,9 +83,14 @@ async def stream_online(data: dict):
     title = stream['data'][0]['title']
     currentGame = stream['data'][0]['game_name']
     streamId = stream['data'][0]['id']
-    api.update_status(
-        f'Cellbit entrou ao vivo!\n\nTítulo: {title}\ntwitch.tv/cellbit')
-    online = True
+    try:
+        api.update_status(f'Cellbit entrou ao vivo!\n\nTítulo: {title}\ntwitch.tv/cellbit')
+        online = True
+    except:
+        emojiList = ':thumbs_up:', ':scream:', ':smiling_imp:', ':sob:'
+        emoji = emojize(choice(emojiList))
+        api.update_status(f'Cellbit entrou ao vivo ({emoji})!\n\nTítulo: {title}\ntwitch.tv/cellbit')
+        online = True
 
 
 async def stream_offline(data: dict):
@@ -135,7 +142,7 @@ async def channel_update(data: dict):
             else:
                 api.update_status_with_media(status, 'gameImg.jpg')
         except:
-            api.update_status(status)
+            api.update_status(status) # pyright: ignore
         finally:
             if game not in gamesPlayed and game not in gamesBlacklist:
                 gamesPlayed.append(game)
