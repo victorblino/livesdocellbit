@@ -1,4 +1,5 @@
-from discord_webhook import DiscordWebhook
+from sre_constants import SUCCESS
+from discord_webhook import DiscordWebhook # pyright: ignore
 from base64 import b64encode
 
 def compareImages():
@@ -14,3 +15,10 @@ def compareImages():
 def sendWebhook(webhookUrl, message):
     webhook = DiscordWebhook(url=webhookUrl, rate_limit_retry=True, content=message)
     webhook.execute()
+
+def printEvent(color, event):
+    colors = {
+        'green': '\033[92m',
+        'red': '\033[91m'
+    }
+    print(f'{colors[color]}{event}')

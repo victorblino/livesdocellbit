@@ -4,7 +4,7 @@ import logging
 import threading
 from twitchAPI import Twitch, EventSub # pyright: ignore
 from dotenv import load_dotenv # pyright: ignore
-from functions.functionsBot import compareImages, sendWebhook
+from functions.functionsBot import compareImages, sendWebhook, printEvent
 from functions.twitchAPI import getStream, dateStream, getVideo
 from asyncio import sleep
 from emoji import emojize
@@ -86,11 +86,14 @@ async def stream_online(data: dict):
     try:
         api.update_status(f'Cellbit entrou ao vivo!\n\nTítulo: {title}\ntwitch.tv/cellbit')
         online = True
+        printEvent('green', 'POST STREAM ONLINE')
     except:
+        print('red', 'ERRO EXCEPT STREAM ONLINE')
         emojiList = ':thumbs_up:', ':scream:', ':smiling_imp:', ':sob:'
         emoji = emojize(choice(emojiList))
         api.update_status(f'Cellbit entrou ao vivo ({emoji})!\n\nTítulo: {title}\ntwitch.tv/cellbit')
         online = True
+        printEvent('green', 'POST STREAM ONLINE')
 
 
 async def stream_offline(data: dict):
@@ -98,6 +101,8 @@ async def stream_offline(data: dict):
     api.update_status('Cellbit encerrou a live!')
     sendWebhook(WEBHOOKS_URLS, 'Cellbit encerrou a live!')
     online = False
+    print('green', 'SUCESSO - POST STREAM ENCERRADA')
+    
 
     if len(gamesPlayed) > 0:
         tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
@@ -109,6 +114,7 @@ async def stream_offline(data: dict):
         status += f'\nVOD (Twitch Tracker): https://twitchtracker.com/cellbit/streams/{streamId}'
         api.update_status(status, in_reply_to_status_id=tweetId)
         gamesPlayed = list()
+        print('green', 'SUCESSO - POST LISTA DE JOGOS')
 
 
 async def channel_update(data: dict):
@@ -147,6 +153,7 @@ async def channel_update(data: dict):
             if game not in gamesPlayed and game not in gamesBlacklist:
                 gamesPlayed.append(game)
             currentGame = game
+            print('green', 'SUCESSO - TROCA DE JOGO')
 
         # sleep(1)
         #  infoVideo = getVideo()
@@ -154,6 +161,7 @@ async def channel_update(data: dict):
         api.update_status(f'[TÍTULO] {title}')
         sendWebhook(WEBHOOKS_URLS, f'[TÍTULO] {title}')
         currentTitle = title
+        print('green', 'SUCESSO - TROCA DE TÍTULO')
 
 # subscribe to EventSub
 hook = EventSub(WEBHOOK_URL, APP_ID, PORT, twitch)
@@ -163,13 +171,12 @@ hook.start()
 print('Iniciando webhooks...\n')
 
 hook.listen_channel_update(user_id, channel_update)
-print('[OK] CHANNEL UPDATE - WEBHOOK')
+print('green', '[OK] CHANNEL UPDATE - WEBHOOK')
 hook.listen_stream_offline(user_id, stream_offline)
-print('[OK] STREAM OFFLINE - WEBHOOK')
+print('green', '[OK] STREAM OFFLINE - WEBHOOK')
 hook.listen_stream_online(user_id, stream_online)
-print('[OK] STREAM ONLINE - WEBHOOK')
+print('green', '[OK] STREAM ONLINE - WEBHOOK')
 print('\n')
-
 
 try:
     print('Rodando!')

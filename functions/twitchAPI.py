@@ -1,7 +1,7 @@
-import requests
+import requests # pyright: ignore
 import json
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv # pyright: ignore
 load_dotenv()
 
 bearer = os.environ.get('TWITCH_BEARER')
@@ -19,7 +19,7 @@ params = {
 def getStream():
 
     import datetime
-    import dateutil.parser
+    import dateutil.parser # pyright: ignore
 
     response = requests.get(
         'https://api.twitch.tv/helix/streams', params=params, headers=headers)
@@ -124,9 +124,9 @@ def getVideo():
 
 def dateStream():
     import datetime
-    import dateutil.parser
+    import dateutil.parser # pyright: ignore
 
-    started_at = getVideo()['started_at']
+    started_at = getVideo()['started_at'] # pyright: ignore
 
     parsedDate = dateutil.parser.isoparse(started_at)
     parsedDate = str(parsedDate).split("+", 1)
