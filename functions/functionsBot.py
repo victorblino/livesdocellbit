@@ -16,7 +16,7 @@ def sendWebhook(webhookUrl, message):
     webhook = DiscordWebhook(url=webhookUrl, rate_limit_retry=True, content=message)
     webhook.execute()
 
-def printEvent(color, event):
+def printEvent(color: str, event: str):
     colors = {
         'green': '\033[92m',
         'red': '\033[91m'

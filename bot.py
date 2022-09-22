@@ -1,9 +1,9 @@
 import os
-import tweepy # pyright: ignore
+import tweepy  # pyright: ignore
 import logging
 import threading
-from twitchAPI import Twitch, EventSub # pyright: ignore
-from dotenv import load_dotenv # pyright: ignore
+from twitchAPI import Twitch, EventSub  # pyright: ignore
+from dotenv import load_dotenv  # pyright: ignore
 from functions.functionsBot import compareImages, sendWebhook, printEvent
 from functions.twitchAPI import getStream, dateStream, getVideo
 from asyncio import sleep
@@ -24,7 +24,7 @@ CONSUMER_SECRET = os.environ.get('TWITTER_CONSUMER_SECRET')
 PORT = os.environ.get('PORT', 8080)
 TARGET_USERNAME = os.environ.get('TARGET_USERNAME')
 LOGGING = os.environ.get('LOGGING')
-WEBHOOKS_URLS= os.environ.get('WEBHOOKS_URLS').split(', ') # pyright: ignore
+WEBHOOKS_URLS = os.environ.get('WEBHOOKS_URLS').split(', ')  # pyright: ignore
 
 if LOGGING == 'TRUE':
     logging.basicConfig(level=logging.INFO)
@@ -84,14 +84,16 @@ async def stream_online(data: dict):
     currentGame = stream['data'][0]['game_name']
     streamId = stream['data'][0]['id']
     try:
-        api.update_status(f'Cellbit entrou ao vivo!\n\nTítulo: {title}\ntwitch.tv/cellbit')
+        api.update_status(
+            f'Cellbit entrou ao vivo!\n\nTítulo: {title}\ntwitch.tv/cellbit')
         online = True
         printEvent('green', 'POST STREAM ONLINE')
     except:
         print('red', 'ERRO EXCEPT STREAM ONLINE')
         emojiList = ':thumbs_up:', ':scream:', ':smiling_imp:', ':sob:'
         emoji = emojize(choice(emojiList))
-        api.update_status(f'Cellbit entrou ao vivo ({emoji})!\n\nTítulo: {title}\ntwitch.tv/cellbit')
+        api.update_status(
+            f'Cellbit entrou ao vivo ({emoji})!\n\nTítulo: {title}\ntwitch.tv/cellbit')
         online = True
         printEvent('green', 'POST STREAM ONLINE')
 
@@ -102,7 +104,6 @@ async def stream_offline(data: dict):
     sendWebhook(WEBHOOKS_URLS, 'Cellbit encerrou a live!')
     online = False
     print('green', 'SUCESSO - POST STREAM ENCERRADA')
-    
 
     if len(gamesPlayed) > 0:
         tweetId = api.user_timeline(screen_name='livesdocellbit')[0].id
@@ -132,14 +133,14 @@ async def channel_update(data: dict):
             imageUrl = twitch.get_games(names=game)['data'][0]['box_art_url'].replace(
                 '{width}', '600').replace('{height}', '800')
             urllib.request.urlretrieve(imageUrl, 'gameImg.jpg')
-            if game == 'Wordle':
-                urllib.request.urlretrieve(
-                    'https://i.imgur.com/IfcsMel.png', 'gameImg.jpg')
             if game not in gamesTranslate:
                 status = f'Cellbit está jogando: {game}\nTempo no VOD: {h}h{m}m{s}s\n\ntwitch.tv/cellbit'
                 sendWebhook(WEBHOOKS_URLS, f'Cellbit está jogando {game}')
             else:
                 status = f'Cellbit está jogando: {gamesTranslate[game]}\nTempo no VOD: {h}h{m}m{s}s\n\ntwitch.tv/cellbit'
+                if game == 'Wordle':
+                    urllib.request.urlretrieve(
+                        'https://i.imgur.com/IfcsMel.png', 'gameImg.jpg')
                 sendWebhook(
                     WEBHOOKS_URLS, f'Cellbit está jogando {gamesTranslate[game]}')
 
@@ -147,21 +148,24 @@ async def channel_update(data: dict):
                 api.update_status(status)
             else:
                 api.update_status_with_media(status, 'gameImg.jpg')
+            printEvent('green', 'SUCESSO - TROCA DE JOGO')
         except:
-            api.update_status(status) # pyright: ignore
+            status = f'Cellbit está jogando: {game}\nTempo no VOD: {h}h{m}m{s}s\n\ntwitch.tv/cellbit'
+            api.update_status(status)  # pyright: ignore
         finally:
             if game not in gamesPlayed and game not in gamesBlacklist:
                 gamesPlayed.append(game)
+                printEvent(
+                    'green', 'SUCESSO - JOGO ADICIONADO A LISTA DE JOGOS JOGADOS')
             currentGame = game
-            print('green', 'SUCESSO - TROCA DE JOGO')
 
         # sleep(1)
         #  infoVideo = getVideo()
-    if title != currentTitle and online == False:
+    if title != currentTitle and online is False:
         api.update_status(f'[TÍTULO] {title}')
         sendWebhook(WEBHOOKS_URLS, f'[TÍTULO] {title}')
         currentTitle = title
-        print('green', 'SUCESSO - TROCA DE TÍTULO')
+        printEvent('green', 'SUCESSO - TROCA DE TÍTULO')
 
 # subscribe to EventSub
 hook = EventSub(WEBHOOK_URL, APP_ID, PORT, twitch)
@@ -171,11 +175,11 @@ hook.start()
 print('Iniciando webhooks...\n')
 
 hook.listen_channel_update(user_id, channel_update)
-print('green', '[OK] CHANNEL UPDATE - WEBHOOK')
+printEvent('green', '[OK] CHANNEL UPDATE - WEBHOOK')
 hook.listen_stream_offline(user_id, stream_offline)
-print('green', '[OK] STREAM OFFLINE - WEBHOOK')
+printEvent('green', '[OK] STREAM OFFLINE - WEBHOOK')
 hook.listen_stream_online(user_id, stream_online)
-print('green', '[OK] STREAM ONLINE - WEBHOOK')
+printEvent('green', '[OK] STREAM ONLINE - WEBHOOK')
 print('\n')
 
 try:
