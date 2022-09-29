@@ -43,7 +43,7 @@ def verifyStreamIsOnline():
         return variables.online 
 
 async def stream_online(data: dict):
-    emoji = ('â˜•', 'ðŸ§›', 'ðŸ‘¾')
+    emoji = ('🌹', '✨', '🍎')
     variables.title_stream = data['event']['title']
     status = f'{variables.streamer_nickname} entrou ao vivo! {variables.title_stream}\n\ntwitch.tv/{variables.streamer_nickname}'
     try:
@@ -52,7 +52,7 @@ async def stream_online(data: dict):
         postTweet(f'{status} ({choice(emoji)})')
 
 async def stream_offline(data: dict):
-    emoji = ('â˜•', 'ðŸ§›', 'ðŸ‘¾')
+    emoji = ('🌹', '✨', '🍎')
     status = f'{variables.streamer_nickname} encerrou a live!'
     status_games_played = f'Games Jogados\n{gamesPlayed(variables.games_played)}\nVOD: {linkTwitchTracker(variables.stream_id)}'
     
