@@ -69,7 +69,7 @@ async def channel_update(data: dict):
 
     if variables.title_stream == data['event']['title'] and variables.online is False: # If title change and stream is offline
         variables.title_stream = data['event']['title'] # Set variable new title
-        status = f'[TÃTULO] {variables.title_stream}'
+        status = f'[TÍTULO] {variables.title_stream}'
         postTweet(status)
 
     elif variables.category_name != data['event']['category_name'] and variables.online == True: # If category (or game) change
