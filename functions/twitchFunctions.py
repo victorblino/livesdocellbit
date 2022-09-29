@@ -24,7 +24,7 @@ async def connectEventSub():
     hook.listen_channel_update(id_streamer, channel_update)
     return hook
 
-def verifyStreamIsOnline():
+verifyStreamIsOnline():
     # Verify if stream is online
     try:
         global stream
