@@ -5,13 +5,13 @@ from utils import variables
 from asyncio import sleep
 from random import choice
 
-def connectTwitch():
+async def connectTwitch():
     global twitch
     twitch = Twitch(variables.app_key, variables.app_secret)
     twitch.authenticate_app([])  # Authenticate the app
     printEvent(True, 'twitch_authenticated')
 
-def connectEventSub():
+async def connectEventSub():
     id_streamer = twitch.get_users(logins=[variables.streamer_nickname])['data'][0]['id']
 
     # Subscribe in Event Subs
@@ -24,7 +24,7 @@ def connectEventSub():
     hook.listen_channel_update(id_streamer, channel_update)
     return hook
 
-def verifyStreamIsOnline():
+async def verifyStreamIsOnline():
     # Verify if stream is online
     try:
         global stream
