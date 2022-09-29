@@ -48,8 +48,10 @@ async def stream_online(data: dict):
     status = f'{variables.streamer_nickname} entrou ao vivo! {variables.title_stream}\n\ntwitch.tv/{variables.streamer_nickname}'
     try:
         postTweet(status)
+        printEvent(True, 'live_on')
     except: # If error (tweet is same)
         postTweet(f'{status} ({choice(emoji)})')
+        printEvent(True, 'live_on')
 
 async def stream_offline(data: dict):
     emoji = ('🌹', '✨', '🍎')
@@ -60,8 +62,11 @@ async def stream_offline(data: dict):
         postTweet(status)
         await sleep(1)
         postReply(status_games_played)
+        printEvent(True, 'live_off')
     except:
         postTweet(f'{status} ({choice(emoji)})')
+        postReply(status_games_played)
+        printEvent(True, 'live_off')
 
 async def channel_update(data: dict):
 
@@ -71,6 +76,8 @@ async def channel_update(data: dict):
         variables.title_stream = data['event']['title'] # Set variable new title
         status = f'[TÍTULO] {variables.title_stream}'
         postTweet(status)
+        postReply(status_games_played)
+        printEvent(True, 'title')
 
     elif variables.category_name != data['event']['category_name'] and variables.online == True: # If category (or game) change
         
@@ -82,7 +89,9 @@ async def channel_update(data: dict):
 
         if compareImages() is False: # Verify if image game is equal a 404 image
             postTweetWithImage(status, 'imageGame.jpg')
+            printEvent(True, 'game_changed')
             return
         else:
             postTweet(status)
+            printEvent(True, 'game_changed')
             return

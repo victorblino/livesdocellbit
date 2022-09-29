@@ -28,6 +28,7 @@ def printEvent(sucessOrfail: bool, event: str) -> None:
         'live_on': '[TWITCH EVENTSUB] - Live Online!',
         'live_off': '[TWITCH EVENTSUB] - Live Offline',
         'game_changed': '[TWITCH EVENTSUB] - Game trocado',
+        'title': '[TWITCH EVENTSUB] - Título trocado'
 
     }
 
