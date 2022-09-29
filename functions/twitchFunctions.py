@@ -72,7 +72,7 @@ async def channel_update(data: dict):
 
     id_streamer = twitch.get_users(logins=[variables.streamer_nickname])['data'][0]['id']
 
-    if variables.title_stream == data['event']['title'] and variables.online is False: # If title change and stream is offline
+    if variables.title_stream != data['event']['title'] and variables.online is False: # If title change and stream is offline
         variables.title_stream = data['event']['title'] # Set variable new title
         status = f'[TÍTULO] {variables.title_stream}'
         postTweet(status)
