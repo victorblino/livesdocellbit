@@ -54,7 +54,7 @@ def compareImages():
 def gamesPlayed(games_list):
     games = ''
     for game in games_list: 
-        games = f'{game}\n'
+        games = f'• {game}\n'
     return games 
 
 def transformData(stream_timestamp):
