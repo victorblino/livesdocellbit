@@ -45,7 +45,7 @@ def compareImages():
     from base64 import b64encode
     with open('404.jpg', 'rb') as not_found:
         image_not_found = b64encode(not_found.read())
-    with open ('gameImage.jpg', 'rb') as game_image:
+    with open ('imageGame.jpg', 'rb') as game_image:
         image_game = b64encode(game_image.read())
         if image_not_found == image_game:
             return True
