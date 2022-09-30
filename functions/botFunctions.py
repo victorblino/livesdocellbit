@@ -1,6 +1,6 @@
 from utils import variables
 
-def printEvent(sucessOrfail: bool, event: str) -> None:
+def printEvent(sucessOrfail: bool, event: str, info: str='') -> None:
     colors = {
         True: '\33[92m',
         False: '\33[91m'
@@ -9,7 +9,7 @@ def printEvent(sucessOrfail: bool, event: str) -> None:
     events = {
         # Bot
 
-        'info_stream': '[BOT] InformaÃ§Ãµes da Stream',
+        'info_stream': '[BOT] Informações da Stream',
         'on_ready': '[BOT] ONLINE',
 
         # Twitch Authentication
@@ -17,18 +17,20 @@ def printEvent(sucessOrfail: bool, event: str) -> None:
 
         # Twitter Authenticaton
         'twitter_authenticated': '[TWITTER AUTHENTICATION] OK',
+
+        # Twitter Posts 
+        'twitter_post': '[TWITTER] POST SUCESSO',
+        'twitter_post_image': '[TWITTER] POST IMAGE SUCESSO',
+        'twitter_post_image': '[TWITTER] POST REPLY SUCESSO',
         
         # Twitch Subscribe Event Subs
-        'subscribe': '[TWITCH EVENT SUB] - INICIANDO WEBHOOKS',
-        'listen_online': '[TWITCH EVENTSUB] - LISTEN ONLINE!',
-        'listen_offline': '[TWITCH EVENTSUB] - LISTEN OFFLINE',
-        'listen_update': '[TWITCH EVENTSUB] - LISTEN UPDATES',
+        'event_sub': '[EVENTSUB] OK',
 
         # Twitch Event Sub
         'live_on': '[TWITCH EVENTSUB] - Live Online!',
         'live_off': '[TWITCH EVENTSUB] - Live Offline',
-        'game_changed': '[TWITCH EVENTSUB] - Game trocado',
-        'title': '[TWITCH EVENTSUB] - Título trocado'
+        'game_changed': '[TWITCH EVENTSUB] - Game trocado - ',
+        'title': '[TWITCH EVENTSUB] - Título trocado - '
 
     }
 
@@ -55,18 +57,7 @@ def gamesPlayed(games_list):
     games = ''
     for game in games_list: 
         games = f'• {game}\n'
-    return games 
-
-def transformData(stream_timestamp):
-    from datetime import datetime
-    import dateutil.parser
-
-    parsed_date = dateutil.parser.isoparse(stream_timestamp)
-    parsed_date = str(parsed_date).split('+1', 1)
-    parsed_date = parsed_date[0]
-    parsed_date = datetime.strptime(parsed_date, '%Y-%m-%d %H:%M:%S')
-
-    return f'[{parsed_date.day} {parsed_date.month} {parsed_date.year}]'
+    return games
 
 def linkTwitchTracker(stream_id):
     return f'https://twitchtracker.com/{variables.streamer_nickname}/streams/{stream_id}'

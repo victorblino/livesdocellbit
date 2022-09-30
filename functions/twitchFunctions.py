@@ -11,7 +11,7 @@ def connectTwitch():
     twitch.authenticate_app([])  # Authenticate the app
     printEvent(True, 'twitch_authenticated')
 
-async def connectEventSub():
+def connectEventSub():
     id_streamer = twitch.get_users(logins=[variables.streamer_nickname])['data'][0]['id']
 
     # Subscribe in Event Subs
@@ -22,6 +22,7 @@ async def connectEventSub():
     hook.listen_stream_online(id_streamer, stream_online)
     hook.listen_stream_offline(id_streamer, stream_offline)
     hook.listen_channel_update(id_streamer, channel_update)
+    printEvent(True, 'event_sub')
     return hook
 
 def verifyStreamIsOnline():
@@ -36,11 +37,11 @@ def verifyStreamIsOnline():
         if variables.category_name not in variables.games_played and variables.category_name not in variables.games_blacklist:
             variables.games_played.append(variables.category_name)
             variables.online = True
-            return variables.category_name
+            return
 
     except IndexError:  # Stream offline
         variables.online = False
-        return variables.online 
+        return 
 
 async def stream_online(data: dict):
     emoji = ('🌹', '✨', '🍎')
@@ -76,15 +77,14 @@ async def channel_update(data: dict):
         variables.title_stream = data['event']['title'] # Set variable new title
         status = f'[TÍTULO] {variables.title_stream}'
         postTweet(status)
-        postReply(status_games_played)
         printEvent(True, 'title')
 
-    elif variables.category_name != data['event']['category_name'] and variables.online == True: # If category (or game) change
+    if variables.category_name != data['event']['category_name'] and variables.online == True: # If category (or game) change
         
         timestamp = twitch.get_videos(user_id=id_streamer)['data'][0]['duration'] # Get timestamp in VOD
         variables.category_name = data['event']['category_name'] # Change the game variable
         variables.games_played.append(variables.category_name)
-        status = f'{variables.streamer_nickname} estÃ¡ jogando: {variables.category_name}\nTempo no VOD: {timestamp}\n\ntwitch.tv/{variables.streamer_nickname}' # Prepare Twitter status
+        status = f'{variables.streamer_nickname} está jogando: {variables.category_name}\nTempo no VOD: {timestamp}\n\ntwitch.tv/{variables.streamer_nickname}' # Prepare Twitter status
         downloadImageGame(twitch.get_games(names=variables.category_name)['data'][0]['box_art_url'].replace('{width}', '600').replace('{height}', '800')) # Download image game
 
         if compareImages() is False: # Verify if image game is equal a 404 image
