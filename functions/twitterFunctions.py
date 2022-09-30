@@ -16,9 +16,9 @@ def postTweet(status):
 
 def postTweetWithImage(status, image):
     api.update_status_with_media(status, image)
-    printEvent(True, 'twitter_image')
+    printEvent(True, 'twitter_post_image')
 
 def postReply(status):
     last_tweet = api.user_timeline(screen_name=variables.bot_user)[0].id
     api.update_status(status, in_reply_to_status_id=last_tweet)
-    printEvent(True, 'twitter_reply')
+    printEvent(True, 'twitter_post_image')
