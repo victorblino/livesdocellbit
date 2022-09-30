@@ -21,7 +21,7 @@ def printEvent(sucessOrfail: bool, event: str, info: str='') -> None:
         # Twitter Posts 
         'twitter_post': '[TWITTER] POST SUCESSO',
         'twitter_post_image': '[TWITTER] POST IMAGE SUCESSO',
-        'twitter_post_image': '[TWITTER] POST REPLY SUCESSO',
+        'twitter_post_reply': '[TWITTER] POST REPLY SUCESSO',
         
         # Twitch Subscribe Event Subs
         'event_sub': '[EVENTSUB] OK',
