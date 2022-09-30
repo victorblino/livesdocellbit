@@ -54,6 +54,8 @@ async def stream_online(data: dict):
         postTweet(f'{status} ({choice(emoji)})')
         printEvent(True, 'live_on')
 
+    variables.online = True
+
 async def stream_offline(data: dict):
     emoji = ('🌹', '✨', '🍎')
     status = f'{variables.streamer_nickname} encerrou a live!'
@@ -68,6 +70,8 @@ async def stream_offline(data: dict):
         postTweet(f'{status} ({choice(emoji)})')
         postReply(status_games_played)
         printEvent(True, 'live_off')
+
+    variables.online = False
 
 async def channel_update(data: dict):
 
