@@ -92,7 +92,8 @@ async def channel_update(data: dict):
         status = f'{variables.streamer_nickname} está jogando: {variables.category_name}\nTempo no VOD: {timestamp}\n\ntwitch.tv/{variables.streamer_nickname}' # Prepare Twitter status
         downloadImageGame(twitch.get_games(names=variables.category_name)['data'][0]['box_art_url'].replace('{width}', '600').replace('{height}', '800')) # Download image game
 
-        variables.games_played.append(variables.category_name) if variables.category_name not in variables.games_blacklist else print()
+        if variables.category_name not in variables.games_blacklist: # Add game in list
+            variables.games_played.append(variables.category_name)
 
         if compareImages() is False and variables.category_name not in variables.games_blacklist: # Verify if image game is equal a 404 image
             postTweetWithImage(status, 'imageGame.jpg')
