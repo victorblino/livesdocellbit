@@ -1,3 +1,0 @@
-- uses: jakebailey/pyright-action@v1
-  with:
-    version: 1.1.244 # Optional
