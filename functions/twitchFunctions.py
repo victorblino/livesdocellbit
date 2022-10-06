@@ -88,7 +88,6 @@ async def channel_update(data: dict):
         
         timestamp = twitch.get_videos(user_id=id_streamer)['data'][0]['duration'] # Get timestamp in VOD
         variables.category_name = data['event']['category_name'] # Change the game variable
-        variables.games_played.append(variables.category_name)
         status = f'{variables.streamer_nickname} está jogando: {variables.category_name}\nTempo no VOD: {timestamp}\n\ntwitch.tv/{variables.streamer_nickname}' # Prepare Twitter status
         downloadImageGame(twitch.get_games(names=variables.category_name)['data'][0]['box_art_url'].replace('{width}', '600').replace('{height}', '800')) # Download image game
 
