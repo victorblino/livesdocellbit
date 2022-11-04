@@ -60,7 +60,7 @@ async def stream_online(data: dict):
 async def stream_offline(data: dict):
     emoji = ('🌹', '✨', '🍎')
     status = f'{variables.streamer_nickname} encerrou a live!'
-    status_games_played = f'Jogos de hoje:\n\n{gamesPlayed(variables.games_played)}\nVOD: {linkTwitchTracker(variables.stream_id)}'
+    status_games_played = f'Jogos de hoje:\n\n{gamesPlayed(variables.games_played)}\nVOD: {linkTwitchTracker(str(variables.stream_id))}'
     
     try:
         postTweet(status)
