@@ -17,7 +17,7 @@ bot_user = os.environ.get('TWITTER_BOT_NICKNAME')
 
 # Variables Bot
 games_played = list()
-games_blacklist = ('Just Chatting', 'Tabletop Simulator', 'Watch Parties')
+games_blacklist = ('Just Chatting', 'Tabletop RPGs', 'Watch Parties')
 
 # Stream Variables
 online: bool = False
