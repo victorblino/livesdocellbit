@@ -45,8 +45,6 @@ def verifyStreamIsOnline():
 
 async def stream_online(data: dict):
     emoji = ('🌹', '✨', '🍎')
-    id_streamer = twitch.get_users(logins=[variables.streamer_nickname])['data'][0]['id']
-    variables.title_stream = twitch.get_streams(user_id=id_streamer)['data'][0]['title']
     status = f'{variables.streamer_nickname} entrou ao vivo! {variables.title_stream}\n\ntwitch.tv/{variables.streamer_nickname}'
     try:
         postTweet(status)
