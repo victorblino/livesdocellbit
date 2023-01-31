@@ -60,4 +60,4 @@ def gamesPlayed(games_list):
     return games
 
 def linkTwitchTracker(stream_id):
-    return f'https://twitchtracker.com/{variables.streamer_nickname}/streams/{stream_id}'
+    return f'https://twitchtracker.com/{variables.streamer_nickname}/streams/{str(stream_id)}'
