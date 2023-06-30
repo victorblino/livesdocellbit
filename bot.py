@@ -1,6 +1,6 @@
 # Imports
 import threading
-from functions.twitterFunctions import connectTwitter
+# from functions.twitterFunctions import connectTwitter
 from functions.botFunctions import printEvent
 from functions.twitchFunctions import connectEventSub, connectTwitch, verifyStreamIsOnline
 
