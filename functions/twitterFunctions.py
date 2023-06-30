@@ -4,18 +4,19 @@ from functions.botFunctions import printEvent
 
 def connectTwitter():
     global api
-    auth = tweepy.OAuthHandler(variables.consumer_key, variables.consumer_secret)
-    auth.set_access_token(variables.key, variables.secret)
-    api = tweepy.API(auth)
+    api = tweepy.Client(
+        consumer_key=variables.consumer_key, consumer_secret=variables.consumer_secret,
+        access_token=variables.app_key, access_token_secret=variables.secret
+    )
     printEvent(True, 'twitter_authenticated')
     return api
 
 def postTweet(status):
-    api.update_status(status)
+    api.create_tweet(text=status)
     printEvent(True, 'twitter_post')
 
 def postTweetWithImage(status, image):
-    api.update_status_with_media(status, image)
+    api.create_tweet(text=status)
     printEvent(True, 'twitter_post_image')
 
 def postReply(status):
