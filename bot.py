@@ -10,8 +10,8 @@ forever = threading.Event()
 # Twitch Authentication
 connectTwitch()
 
-# Twitter Authentication
-connectTwitter()
+# # Twitter Authentication
+# connectTwitter()
 
 # Connect to EventSub
 hook = connectEventSub()

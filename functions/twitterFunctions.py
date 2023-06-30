@@ -2,14 +2,11 @@ import tweepy
 from utils import variables
 from functions.botFunctions import printEvent
 
-def connectTwitter():
-    global api
-    api = tweepy.Client(
-        consumer_key=variables.consumer_key, consumer_secret=variables.consumer_secret,
-        access_token=variables.app_key, access_token_secret=variables.secret
-    )
-    printEvent(True, 'twitter_authenticated')
-    return api
+api = tweepy.Client(
+    consumer_key=variables.consumer_key, consumer_secret=variables.consumer_secret,
+    access_token=variables.app_key, access_token_secret=variables.secret
+)
+printEvent(True, 'twitter_authenticated')
 
 def postTweet(status):
     api.create_tweet(text=status)
