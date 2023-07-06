@@ -3,7 +3,7 @@ import threading
 # from functions.twitterFunctions import connectTwitter
 from functions.botFunctions import printEvent
 from functions.twitchFunctions import connectEventSub, connectTwitch, verifyStreamIsOnline
-from functions.twitterFunctions import connectTwitter
+
 # Global Variables
 forever = threading.Event()
 
