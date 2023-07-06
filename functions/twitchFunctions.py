@@ -81,10 +81,9 @@ async def channel_update(data: dict):
         printEvent(True, 'title')
 
     if variables.category_name != data['event']['category_name'] and variables.online == True: # If category (or game) change
-        
-        timestamp = twitch.get_videos(user_id=id_streamer)['data'][0]['duration'] # Get timestamp in VOD
+
         variables.category_name = data['event']['category_name'] # Change the game variable
-        status = f'{variables.streamer_nickname} está jogando: {variables.category_name}\nTempo no VOD: {timestamp}\n\ntwitch.tv/{variables.streamer_nickname}' # Prepare Twitter status
+        status = f'{variables.streamer_nickname} está jogando: {variables.category_name}\ntwitch.tv/{variables.streamer_nickname}' # Prepare Twitter status
         downloadImageGame(twitch.get_games(names=variables.category_name)['data'][0]['box_art_url'].replace('{width}', '600').replace('{height}', '800')) # Download image game
 
         if variables.category_name not in variables.games_blacklist: # Add game in list
