@@ -50,8 +50,13 @@ async def stream_online(data: dict):
         postTweet(status)
         printEvent(True, 'live_on')
     except: # If error (tweet is same)
-        postTweet(f'A stream provavelmente caiu, mas tá de volta -> twitch.tv/{variables.streamer_nickname})')
-        printEvent(True, 'live_on')
+        try: 
+            postTweet(f'A stream provavelmente caiu, mas tá de volta -> twitch.tv/{variables.streamer_nickname}')
+            printEvent(True, 'live_on')
+        except: 
+            emoji = ('🌹', '✨', '🍎')
+            postTweet(f'A stream provavelmente caiu, mas tá de volta -> twitch.tv/{variables.streamer_nickname} ({choice(emoji)}')
+            printEvent(True, 'live_on')
 
     variables.online = True
 
