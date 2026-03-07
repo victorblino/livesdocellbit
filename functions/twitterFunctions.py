@@ -9,7 +9,6 @@ client = tweepy.Client(
     consumer_secret=variables.consumer_secret,
     access_token=variables.twitter_access_token,
     access_token_secret=variables.twitter_access_secret,
-    wait_on_rate_limit=True,
 )
 
 def _post(text: str, retries: int = 3, delay: int = 15) -> None:
@@ -17,7 +16,13 @@ def _post(text: str, retries: int = 3, delay: int = 15) -> None:
         try:
             client.create_tweet(text=text)
             return
-        except tweepy.errors.TwitterServerError:
+        except tweepy.BadRequest:
+            printEvent(True, 'twitter_duplicate_tweet')
+            return
+        except tweepy.TooManyRequests:
+            printEvent(True, 'twitter_rate_limit')
+            time.sleep(60)
+        except tweepy.TwitterServerError:
             if attempt < retries - 1:
                 printEvent(True, f'twitter_server_error_retry_{attempt + 1}')
                 time.sleep(delay)
