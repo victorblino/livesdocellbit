@@ -1,6 +1,6 @@
 from twitchAPI import Twitch, EventSub
 from functions.botFunctions import compareImages, downloadImageGame, gamesPlayed, linkTwitchTracker, printEvent
-from functions.twitterFunctions import postReply, postTweet, postTweetWithImage
+from functions.twitterFunctions import postTweet, postTweetWithImage
 from utils import variables
 from asyncio import sleep
 from random import choice
