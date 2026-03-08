@@ -5,7 +5,7 @@ load_dotenv()
 # Enviroment Variables
 app_key = os.environ.get('TWITCH_APP_ID')
 app_secret = os.environ.get('TWITCH_APP_SECRET')
-streamer_nickname = os.environ.get('TARGET_USERNAME')
+streamer_nickname = os.environ.get('TARGET_USERNAME', '').capitalize()
 webhook_url = os.environ.get('WEBHOOK_URL')
 port = int(os.environ.get('PORT', 8080))
 consumer_key = os.environ.get('TWITTER_CONSUMER_KEY')

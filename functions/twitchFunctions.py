@@ -1,70 +1,79 @@
-from twitchAPI import Twitch, EventSub
+from twitchAPI.twitch import Twitch
+from twitchAPI.eventsub.webhook import EventSubWebhook
 from functions.botFunctions import compareImages, downloadImageGame, gamesPlayed, linkTwitchTracker, printEvent
 from functions.twitterFunctions import postTweet, postTweetWithImage
 from utils import variables
-from asyncio import sleep
 from random import choice
 
-def connectTwitch():
+twitch = None
+
+async def connectTwitch():
     global twitch
-    twitch = Twitch(variables.app_key, variables.app_secret)
-    twitch.authenticate_app([])  # Authenticate the app
+    twitch = await Twitch(variables.app_key, variables.app_secret)
     printEvent(True, 'twitch_authenticated')
 
-def connectEventSub():
-    id_streamer = twitch.get_users(logins=[variables.streamer_nickname])['data'][0]['id']
+async def connectEventSub():
+    user_id = None
+    async for user in twitch.get_users(logins=[variables.streamer_nickname]):
+        user_id = user.id
 
-    # Subscribe in Event Subs
-    hook = EventSub(variables.webhook_url, variables.app_key, variables.port, twitch)
-    hook.unsubscribe_all()  # Unsubscribe to prevent bugs
+    hook = EventSubWebhook(variables.webhook_url, variables.port, twitch)
+    await hook.unsubscribe_all()
     hook.start()
 
-    hook.listen_stream_online(id_streamer, stream_online)
-    hook.listen_stream_offline(id_streamer, stream_offline)
-    hook.listen_channel_update(id_streamer, channel_update)
+    await hook.listen_stream_online(user_id, stream_online)
+    await hook.listen_stream_offline(user_id, stream_offline)
+    await hook.listen_channel_update(user_id, channel_update)
     printEvent(True, 'event_sub')
     return hook
 
-def verifyStreamIsOnline():
-    # Verify if stream is online
+async def verifyStreamIsOnline():
     try:
-        global stream
-        id_streamer = twitch.get_users(logins=[variables.streamer_nickname])['data'][0]['id']
-        stream_info = twitch.get_streams(user_id=id_streamer)['data'][0]
-        variables.title_stream, variables.category_name, variables.stream_id = stream_info['title'], stream_info['game_name'], stream_info['id']
-        printEvent(True, 'info_stream')      
-        # If game not in games played add in list
-        if variables.category_name not in variables.games_played and variables.category_name not in variables.games_blacklist:
-            variables.games_played.append(variables.category_name)
+        user_id = None
+        async for user in twitch.get_users(logins=[variables.streamer_nickname]):
+            user_id = user.id
+
+        found = False
+        async for stream in twitch.get_streams(user_id=user_id):
+            variables.title_stream = stream.title
+            variables.category_name = stream.game_name
+            variables.stream_id = stream.id
+            found = True
+            break
+
+        if found:
+            if variables.category_name not in variables.games_played and \
+               variables.category_name not in variables.games_blacklist:
+                variables.games_played.append(variables.category_name)
             variables.online = True
-            return
+            printEvent(True, 'info_stream')
+        else:
+            variables.online = False
 
-    except IndexError:  # Stream offline
+    except Exception:
         variables.online = False
-        return 
 
-async def stream_online(data: dict):
-    emoji = ('🌹', '✨', '🍎')
+async def stream_online(data):
     status = f'{variables.streamer_nickname} entrou ao vivo! {variables.title_stream}\n\ntwitch.tv/{variables.streamer_nickname}'
     try:
         postTweet(status)
         printEvent(True, 'live_on')
-    except: # If error (tweet is same)
-        try: 
+    except:
+        try:
             postTweet(f'A stream provavelmente caiu, mas tá de volta -> twitch.tv/{variables.streamer_nickname}')
             printEvent(True, 'live_on')
-        except: 
+        except:
             emoji = ('🌹', '✨', '🍎')
             postTweet(f'A stream provavelmente caiu, mas tá de volta -> twitch.tv/{variables.streamer_nickname} ({choice(emoji)}')
             printEvent(True, 'live_on')
 
     variables.online = True
 
-async def stream_offline(data: dict):
+async def stream_offline(data):
+    from asyncio import sleep
     emoji = ('🌹', '✨', '🍎')
     status = f'{variables.streamer_nickname} encerrou a live!'
 
-    
     try:
         postTweet(status)
         await sleep(1)
@@ -75,30 +84,29 @@ async def stream_offline(data: dict):
 
     variables.online = False
 
-async def channel_update(data: dict):
-
-    id_streamer = twitch.get_users(logins=[variables.streamer_nickname])['data'][0]['id']
-
-    if variables.title_stream != data['event']['title'] and variables.online is False: # If title change and stream is offline
-        variables.title_stream = data['event']['title'] # Set variable new title
-        status = f'[TÍTULO] {variables.title_stream}'
-        postTweet(status)
+async def channel_update(data):
+    if variables.title_stream != data.event.title and variables.online is False:
+        variables.title_stream = data.event.title
+        postTweet(f'[TÍTULO] {variables.title_stream}')
         printEvent(True, 'title')
 
-    if variables.category_name != data['event']['category_name'] and variables.online == True: # If category (or game) change
+    if variables.category_name != data.event.category_name and variables.online is True:
+        variables.category_name = data.event.category_name
+        status = f'{variables.streamer_nickname} está jogando: {variables.category_name}\ntwitch.tv/{variables.streamer_nickname}'
 
-        variables.category_name = data['event']['category_name'] # Change the game variable
-        status = f'{variables.streamer_nickname} está jogando: {variables.category_name}\ntwitch.tv/{variables.streamer_nickname}' # Prepare Twitter status
-        downloadImageGame(twitch.get_games(names=variables.category_name)['data'][0]['box_art_url'].replace('{width}', '600').replace('{height}', '800')) # Download image game
+        box_art_url = None
+        async for game in twitch.get_games(names=[variables.category_name]):
+            box_art_url = game.box_art_url.replace('{width}', '600').replace('{height}', '800')
+            break
 
-        if variables.category_name not in variables.games_blacklist: # Add game in list
+        if box_art_url:
+            downloadImageGame(box_art_url)
+
+        if variables.category_name not in variables.games_blacklist:
             variables.games_played.append(variables.category_name)
 
-        if compareImages() is False and variables.category_name not in variables.games_blacklist: # Verify if image game is equal a 404 image
+        if compareImages() is False and variables.category_name not in variables.games_blacklist:
             postTweetWithImage(status, 'imageGame.jpg')
-            printEvent(True, 'game_changed')
-            return
         else:
             postTweet(status)
-            printEvent(True, 'game_changed')
-            return
+        printEvent(True, 'game_changed')
