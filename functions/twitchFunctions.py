@@ -85,10 +85,14 @@ async def stream_offline(data):
     variables.online = False
 
 async def channel_update(data):
-    if variables.title_stream != data.event.title and variables.online is False:
+    if variables.title_stream != data.event.title and variables.online is True:
         variables.title_stream = data.event.title
-        postTweet(f'[TÍTULO] {variables.title_stream}')
-        printEvent(True, 'title')
+        return
+
+    if variables.title_stream != data.event.title and variables.online is False:
+            variables.title_stream = data.event.title
+            postTweet(f'[TÍTULO] {variables.title_stream}')
+            printEvent(True, 'title')
 
     if variables.category_name != data.event.category_name and variables.online is True:
         variables.category_name = data.event.category_name
